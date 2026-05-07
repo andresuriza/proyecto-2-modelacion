@@ -14,7 +14,6 @@ class Ui_MainWindow(object):
     def CreateTask(self, taskForm):
         taskForm.addRow(QLabel("Tarea"))
 
-
     def CreateProcess(self, groupForm):
         taskForm = QFormLayout()
         # labelList = []
@@ -322,8 +321,9 @@ class Ui_MainWindow(object):
 
         QMetaObject.connectSlotsByName(MainWindow)
     # setupUi
-        self.actionProceso_2.triggered.connect(lambda: self.CreateProcess(groupForm))
 
+        self.actionProceso_2.triggered.connect(lambda: self.CreateProcess(groupForm))
+        
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"LinProd", None))
         self.actionNew.setText(QCoreApplication.translate("MainWindow", u"New", None))
