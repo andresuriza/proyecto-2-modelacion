@@ -160,25 +160,57 @@ class Task:
             else:
                 prev_t = current_t
 
-p1 = Process(input("Digite proceso: "), int(input("Numero de productos=")))
+# Pide al usuario ingresar cuantas tareas desee al proceso de entrada
+def input_tasks(p):
+    print("Digite tareas:")
 
-print("Digite tareas:")
+    p.CreateTask(int(input("Tiempo proceso= ")))
 
-p1.CreateTask(int(input("Tiempo proceso= ")))
+    while True:
+        req = input("Requiere otra tarea? ").lower()
+        if req == "s":
+            p.CreateTask(int(input("Tiempo proceso= ")))
+        elif req == "n":
+            p.QueueProducts()
+            break
+        else:
+            print("Uso incorrecto: por favor escribir 's' o 'n'")
+
+def set_next_process(head):
+    tmp = head
+
+    while tmp.next != None:
+        tmp.GetData().SetNext(tmp.next.GetData())
+        tmp = tmp.next
+
+
+process_list = LinkedList()
+
+first_p = Process(input("Digite proceso: "), int(input("Numero de productos=")))
+input_tasks(first_p)
+first_p.SetEnabled()
+
+process_list.Insert(first_p)
 
 while True:
-    req = input("Requiere otra tarea? ").lower()
+    req = input("Crear otro proceso? ").lower()
+
     if req == "s":
-        p1.CreateTask(int(input("Tiempo proceso= ")))
+       p = Process(input("Digite proceso: "), int(input("Numero de productos=")))
+       input_tasks(p)
+       process_list.Insert(p)
     elif req == "n":
         break
     else:
         print("Uso incorrecto: por favor escribir 's' o 'n'")
 
+# Asociar procesos entre si
+set_next_process(process_list.GetHead())
+
 t1 = threading.Thread(target=cycle)
-p1.QueueProducts()
-p1.SetEnabled()
+
+process_list.GetHead().GetData().SetEnabled()
 
 t1.start()
-p1.StartThreads()
-p1.JoinThreads()
+process_list.GetHead().GetData().StartThreads()
+process_list.GetHead().GetData().JoinThreads()
