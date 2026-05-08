@@ -80,10 +80,13 @@ class Process:
     def QueueProducts(self):
         head = self.tasks.GetHead()
 
-        while head != None:
-            for _ in range(self.products):
-                head.GetData().Queue()
+        # Se encolan productos a la primera tarea
+        for _ in range(self.products):
+            head.GetData().Queue()
 
+        while head != None:
+
+            # Tarea referencia a la siguiente
             if head.next != None:
                 head.GetData().SetNext(head.next.GetData())
 
@@ -92,7 +95,7 @@ class Process:
 
     # Comienza a ejecutar las tareas
     def StartThreads(self):
-        print(f"--- {self.name} ---")
+        print(f"\033[91m --- {self.name} --- \033[0m")
 
         for task in self.threads:
             task.start()
