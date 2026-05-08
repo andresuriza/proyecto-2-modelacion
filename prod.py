@@ -20,37 +20,87 @@ class Node:
         self.data = data
         self.next = None
 
+    def GetData(self):
+        return self.data
+
+class LinkedList:
+    def __init__(self):
+        self.head = None
+
+    def GetHead(self):
+        return self.head
+    
+    def Insert(self, val):
+        if self.head == None:
+            self.head = Node(val)
+
+        else:
+            new_val = Node(val)
+            tmp = self.head
+
+            while tmp.next != None:
+                tmp = tmp.next
+            
+            tmp.next = new_val
+
 class Process:
     def __init__(self, name, products):
-        self.products = products
+        self.enabled = True
+        self.next = None
         self.name = name
-        self.threads = []
-        self.tasks = []
         self.n_tasks = 0
+        self.products = products
+        self.threads = []
+        self.tasks = LinkedList()
+
+    # Referencia a siguiente proceso
+    def SetNext(self, next):
+        self.next = next
+
+    def SetEnabled(self):
+        self.enabled = True
     
     def CreateTask(self, processing_t):
         self.n_tasks += 1
-        t = Task(self.n_tasks, processing_t, None, self.products)
-        self.tasks.append(t)
+        t = Task(self.n_tasks, processing_t, self.products)
+        self.tasks.Insert(t)
         self.threads.append(threading.Thread(target=t.Run))
 
-    def QueueProducts(self):
-        for task in self.tasks:
-            for _ in range(self.products):
-                task.Queue()
-
     def JoinThreads(self):
-        for task in self.threads:
-            task.join()
+        n = len(self.threads)
+        for i in range(n):
+            self.threads[i].join()
 
+            # Si es la ultima tarea, iniciar proximo proceso
+            if (i == (n - 1)):
+                if self.next != None:
+                    self.next.StartThreads()
+                    self.next.JoinThreads()
+
+    def QueueProducts(self):
+        head = self.tasks.GetHead()
+
+        while head != None:
+            for _ in range(self.products):
+                head.GetData().Queue()
+
+            if head.next != None:
+                head.GetData().SetNext(head.next.GetData())
+
+            head = head.next
+
+
+    # Comienza a ejecutar las tareas
     def StartThreads(self):
+        print(f"--- {self.name} ---")
+
         for task in self.threads:
             task.start()
 
 class Task:
-    def __init__(self, n, processing_t, next, products):
+    def __init__(self, n, processing_t, products):
         self.products = products
-        self.next = next
+        self.next = None
         # Numero de tarea
         self.n = n
         # Tiempo de procesamiento
@@ -60,6 +110,9 @@ class Task:
         # Contenido encolado
         self.queue_n = 0
         self.current = 1
+
+    def SetNext(self, next):
+        self.next = next
 
     def Queue(self):
         if not self.is_processing:
@@ -74,7 +127,7 @@ class Task:
             # Ya termino, no mas bucle
             if self.products == 0:
                 break
-
+            
             if self.is_processing:
                 # Mientras queden productos
                 if self.queue_n > 0:
@@ -105,16 +158,22 @@ class Task:
                 prev_t = current_t
 
 t1 = threading.Thread(target=cycle)
-p1 = Process("procesoA", 5)
+p1 = Process("procesoA", 3)
+p2 = Process("procesoB", 3)
 
 p1.CreateTask(1)
 p1.CreateTask(2)
 p1.QueueProducts()
+
+p2.CreateTask(1)
+p2.QueueProducts()
+
+p1.SetNext(p2)
+p1.SetEnabled()
 
 # Iniciar los threads
 t1.start()
 p1.StartThreads()
 
 # Join los threads
-t1.join()
 p1.JoinThreads()
