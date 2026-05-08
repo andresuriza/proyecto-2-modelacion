@@ -160,23 +160,25 @@ class Task:
             else:
                 prev_t = current_t
 
+p1 = Process(input("Digite proceso: "), int(input("Numero de productos=")))
+
+print("Digite tareas:")
+
+p1.CreateTask(int(input("Tiempo proceso= ")))
+
+while True:
+    req = input("Requiere otra tarea? ").lower()
+    if req == "s":
+        p1.CreateTask(int(input("Tiempo proceso= ")))
+    elif req == "n":
+        break
+    else:
+        print("Uso incorrecto: por favor escribir 's' o 'n'")
+
 t1 = threading.Thread(target=cycle)
-p1 = Process("procesoA", 3)
-p2 = Process("procesoB", 3)
-
-p1.CreateTask(1)
-p1.CreateTask(2)
 p1.QueueProducts()
-
-p2.CreateTask(1)
-p2.QueueProducts()
-
-p1.SetNext(p2)
 p1.SetEnabled()
 
-# Iniciar los threads
 t1.start()
 p1.StartThreads()
-
-# Join los threads
 p1.JoinThreads()
