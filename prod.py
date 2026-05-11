@@ -136,12 +136,14 @@ class Task:
             # Ya termino, no mas bucle
             if self.products == 0:
                 break
-            
+
+            time.sleep(0.05)  # evita busy-wait que bloquea el GIL
+
             if self.is_processing:
                 # Mientras queden productos
                 if self.queue_n > 0:
-                    # Si ha transcurrido ya el tiempo necesario
-                    if ((current_t - prev_t) == self.processing_t):
+                    # >= en vez de == para no perderse un ciclo si el thread se atrasa
+                    if ((current_t - prev_t) >= self.processing_t):
                         lock.acquire()
                         print(f"Tarea{self.n}")
                         print(f"Procesando producto #{self.current}")

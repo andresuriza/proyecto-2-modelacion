@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinProd – Procesos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="navbar-logo">YONI</div>
+        <div class="navbar-tiempo">
+            <div class="tiempo-bar">
+                <span class="tiempo-label">Tiempo</span>
+                <div class="tiempo-fill" id="tiempo-fill" style="width: 0%"></div>
+            </div>
+            <span class="tiempo-valor" id="tiempo-valor">t = 0</span>
+        </div>
+        <ul class="navbar-links">
+            <li><a href="/">Home</a></li>
+            <li><a href="/procesos" class="active">Procesos</a></li>
+            <li><a href="/estadisticas">Estadísticas</a></li>
+        </ul>
+    </nav>
+
+    <!-- LAYOUT PRINCIPAL -->
+    <div class="p3-layout">
+
+        <!-- PANEL IZQUIERDO -->
+        <aside class="p3-left">
+            <h1 class="p3-titulo">Proceso</h1>
+            <img src="/static/img/letra3d.png" alt="" class="p3-letra">
+
+            <!-- Selector de proceso si hay varios -->
+            <div class="p3-selector" id="p3-selector"></div>
+
+            <div class="p3-controls">
+                <button class="btn-crear" id="btn-iniciar">Iniciar</button>
+                <button class="btn-pausa" id="btn-pausa" title="Pausar">
+                    <span class="pausa-icon">&#9654;</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- PANEL DERECHO: fondo iridiscente + tarjetas scrolleables -->
+        <section class="p3-right">
+            <div class="p3-right-bg"></div>
+            <div class="p3-tareas-scroll" id="p3-tareas-scroll">
+                <!-- Cards se generan con JS -->
+                <p class="p3-empty" id="p3-empty">No hay procesos creados todavía.</p>
+            </div>
+        </section>
+
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="{{ url_for('static', filename='js/procesos.js') }}"></script>
+</body>
+</html>

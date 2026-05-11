@@ -1,21 +1,20 @@
 from flask import Flask, render_template, jsonify, request
 from flask_socketio import SocketIO, emit
 import threading
-from prod import Process, LinkedList, cycle, set_next_process, lock
 import time
+import prod
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'linprod-secret'
 socketio = SocketIO(app, cors_allowed_origins="*")
 
-# Estado global de la simulación
 simulation = {
-    'process_list': LinkedList(),
+    'process_list': prod.LinkedList(),
     'running': False,
     'paused': False,
     'current_t': 0,
     'done': False,
-    'processes_config': []  # guarda config para poder reiniciar
+    'processes_config': []
 }
 
 # ── Rutas ──────────────────────────────────────────────────────────────────────
@@ -41,12 +40,12 @@ def estadisticas():
 @app.route('/api/crear-proceso', methods=['POST'])
 def crear_proceso():
     data = request.get_json()
-    nombre = data.get('nombre')
-    cantidad = int(data.get('cantidad_producto'))
-    tareas = data.get('tareas', [])  # lista de {tiempo_proceso: N}
+    nombre        = data.get('nombre')
+    cantidad      = int(data.get('cantidad_producto'))
+    tareas_config = data.get('tareas', [])
 
-    p = Process(nombre, cantidad)
-    for t in tareas:
+    p = prod.Process(nombre, cantidad)
+    for t in tareas_config:
         p.CreateTask(int(t['tiempo_proceso']))
     p.QueueProducts()
 
@@ -60,9 +59,11 @@ def iniciar():
     if simulation['running']:
         return jsonify({'ok': False, 'mensaje': 'Ya hay una simulación corriendo'})
 
-    set_next_process(simulation['process_list'].GetHead())
+    prod.set_next_process(simulation['process_list'].GetHead())
     simulation['running'] = True
-    simulation['done'] = False
+    simulation['done']    = False
+    prod.done             = False
+    prod.current_t        = 0
 
     threading.Thread(target=_run_simulation, daemon=True).start()
     return jsonify({'ok': True})
@@ -76,6 +77,8 @@ def pausar():
 def estado():
     return jsonify(_get_estado())
 
+# ── Lógica de simulación ───────────────────────────────────────────────────────
+
 def _get_estado():
     procesos = []
     node = simulation['process_list'].GetHead()
@@ -86,46 +89,52 @@ def _get_estado():
         while t_node:
             t = t_node.GetData()
             tareas.append({
-                'n': t.n,
-                'procesando': t.is_processing,
-                'en_cola': t.queue_n,
+                'n':              t.n,
+                'procesando':     t.is_processing,
+                'en_cola':        t.queue_n,
                 'tiempo_proceso': t.processing_t,
-                'completados': p.products - t.products if hasattr(t, 'products') else 0
+                'completados':    p.products - t.products,
+                'producto_actual': t.current if t.is_processing else None
             })
             t_node = t_node.next
         procesos.append({'nombre': p.name, 'tareas': tareas})
         node = node.next
-    return {'procesos': procesos, 'tiempo': simulation['current_t'], 'paused': simulation['paused']}
+    return {
+        'procesos': procesos,
+        'tiempo':   simulation['current_t'],
+        'paused':   simulation['paused']
+    }
 
 def _run_simulation():
-    import prod
-    prod.done = False
-    prod.current_t = 0
-
     head = simulation['process_list'].GetHead()
     if head is None:
         return
 
-    clock_thread = threading.Thread(target=_clock, daemon=True)
+    # Usa prod.cycle() directamente — misma lógica que el standalone
+    clock_thread = threading.Thread(target=prod.cycle, daemon=True)
     clock_thread.start()
+
+    # Loop separado solo para emitir estado al UI (no interfiere con el timing)
+    emit_thread = threading.Thread(target=_emit_loop, daemon=True)
+    emit_thread.start()
 
     head.GetData().StartThreads()
     head.GetData().JoinThreads()
 
+    # Detiene el clock de prod.py
+    prod.done = True
     simulation['running'] = False
-    simulation['done'] = True
+    simulation['done']    = True
     socketio.emit('simulacion_terminada', {})
 
-def _clock():
-    import prod
-    while not prod.done and simulation['running']:
+def _emit_loop():
+    """Solo lee estado y emite al UI. No toca el timing."""
+    while simulation['running']:
         while simulation['paused']:
             time.sleep(0.1)
-        with prod.lock:
-            simulation['current_t'] = prod.current_t
-            socketio.emit('tick', _get_estado())
-        time.sleep(1)
-        prod.current_t += 1
+        simulation['current_t'] = prod.current_t
+        socketio.emit('tick', _get_estado())
+        time.sleep(0.5)  # refresca la UI dos veces por segundo
 
 # ── SocketIO ───────────────────────────────────────────────────────────────────
 
