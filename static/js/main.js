@@ -1,21 +1,15 @@
 const socket = io();
 
-let tiempoMax = 50;
+// ── Al cargar Home, mostrar procesos ya creados ───────────────────────────────
+cargarProcesosExistentes();
 
-socket.on('tick', (data) => {
-    actualizarTiempo(data.tiempo);
-});
-
-function actualizarTiempo(t) {
-    const fill = document.getElementById('tiempo-fill');
-    const valor = document.getElementById('tiempo-valor');
-    if (!fill || !valor) return;
-    const pct = Math.min((t / tiempoMax) * 100, 100);
-    fill.style.width = pct + '%';
-    valor.textContent = `t = ${t}`;
+async function cargarProcesosExistentes() {
+    const res   = await fetch('/api/procesos-creados');
+    const lista = await res.json();
+    if (lista.length > 0) renderLinea(lista);
 }
 
-// ── Formulario Home ───────────────────────────────────────────────────────────
+// ── Formulario nuevo proceso ──────────────────────────────────────────────────
 document.getElementById('form-proceso')?.addEventListener('submit', function (e) {
     e.preventDefault();
 
@@ -28,10 +22,32 @@ document.getElementById('form-proceso')?.addEventListener('submit', function (e)
         return;
     }
 
-    // Guarda datos en sessionStorage y va a página de tareas
     sessionStorage.setItem('proceso_pendiente', JSON.stringify({ nombre, cantidad, nTareas }));
     window.location.href = '/tareas';
 });
+
+// ── Render lista de procesos ──────────────────────────────────────────────────
+function renderLinea(lista) {
+    const card  = document.getElementById('card-linea');
+    const linea = document.getElementById('linea-lista');
+    card.style.display = 'block';
+    linea.innerHTML = '';
+
+    lista.forEach(p => {
+        const badges = [];
+        if (p.inicial) badges.push('<span class="badge">Inicial</span>');
+        if (p.final)   badges.push('<span class="badge">Final</span>');
+
+        const item = document.createElement('div');
+        item.className = 'proceso-item';
+        item.innerHTML = `
+            <div class="proceso-dot"></div>
+            <span class="proceso-nombre">${p.nombre} ${badges.join('')}</span>
+            <span class="proceso-meta">${p.productos} productos · ${p.n_tareas} tareas</span>
+        `;
+        linea.appendChild(item);
+    });
+}
 
 // ── Toast ─────────────────────────────────────────────────────────────────────
 function mostrarToast(msg) {

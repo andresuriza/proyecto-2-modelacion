@@ -35,6 +35,7 @@
     <!-- CONTENIDO PRINCIPAL -->
     <main class="main-content">
 
+        <!-- Formulario nuevo proceso -->
         <div class="card">
             <form id="form-proceso">
                 <div class="form-group">
@@ -53,6 +54,17 @@
                     <button type="submit" class="btn-crear">Crear</button>
                 </div>
             </form>
+        </div>
+
+        <!-- Lista de procesos ya creados -->
+        <div class="card" id="card-linea" style="display:none">
+            <h2 class="card-title">Línea de producción</h2>
+            <div id="linea-lista"></div>
+            <div class="form-actions" style="margin-top:1.25rem">
+                <button class="btn-crear" onclick="window.location.href='/procesos'">
+                    Ver simulación →
+                </button>
+            </div>
         </div>
 
     </main>

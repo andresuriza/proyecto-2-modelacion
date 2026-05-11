@@ -54,7 +54,7 @@ document.getElementById('btn-guardar')?.addEventListener('click', async () => {
     if (data.ok) {
         sessionStorage.removeItem('proceso_pendiente');
         mostrarToast(data.mensaje);
-        setTimeout(() => window.location.href = '/procesos', 1200);
+        setTimeout(() => window.location.href = '/', 1200);
     }
 });
 

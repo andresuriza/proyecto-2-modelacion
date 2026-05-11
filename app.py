@@ -77,6 +77,31 @@ def pausar():
 def estado():
     return jsonify(_get_estado())
 
+@app.route('/api/procesos-creados', methods=['GET'])
+def procesos_creados():
+    lista = []
+    node = simulation['process_list'].GetHead()
+    i = 0
+    total = 0
+    while node:
+        node = node.next
+        total += 1
+    node = simulation['process_list'].GetHead()
+    while node:
+        p = node.GetData()
+        es_inicial = (i == 0)
+        es_final   = (i == total - 1)
+        lista.append({
+            'nombre':   p.name,
+            'productos': p.products,
+            'n_tareas':  p.n_tasks,
+            'inicial':   es_inicial,
+            'final':     es_final
+        })
+        node = node.next
+        i += 1
+    return jsonify(lista)
+
 # ── Lógica de simulación ───────────────────────────────────────────────────────
 
 def _get_estado():
