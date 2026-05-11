@@ -76,6 +76,14 @@ class Process:
                     self.next.StartThreads()
                     self.next.JoinThreads()
 
+    def Reset(self):
+        self.next = None
+        node = self.tasks.GetHead()
+        while node:
+            node.GetData().Reset()
+            node = node.next
+        self.QueueProducts()
+
     def QueueProducts(self):
         head = self.tasks.GetHead()
 
@@ -108,17 +116,21 @@ class Process:
 
 class Task:
     def __init__(self, n, processing_t, products):
-        self.products = products
-        self.next = None
-        # Numero de tarea
-        self.n = n
-        # Tiempo de procesamiento
-        self.processing_t = processing_t
-        # Bool, se esta procesando?
+        self._initial_products = products
+        self.products      = products
+        self.next          = None
+        self.n             = n
+        self.processing_t  = processing_t
         self.is_processing = False
-        # Contenido encolado
-        self.queue_n = 0
-        self.current = 1
+        self.queue_n       = 0
+        self.current       = 1
+
+    def Reset(self):
+        self.products      = self._initial_products
+        self.queue_n       = 0
+        self.is_processing = False
+        self.current       = 1
+        self.next          = None
 
     def SetNext(self, next):
         self.next = next

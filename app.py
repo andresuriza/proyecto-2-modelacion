@@ -58,8 +58,9 @@ def crear_proceso():
 def iniciar():
     if simulation['running']:
         return jsonify({'ok': False, 'mensaje': 'Ya hay una simulación corriendo'})
+    if simulation['process_list'].GetHead() is None:
+        return jsonify({'ok': False, 'mensaje': 'No hay procesos creados'})
 
-    prod.set_next_process(simulation['process_list'].GetHead())
     simulation['running'] = True
     simulation['done']    = False
     prod.done             = False
@@ -131,9 +132,14 @@ def _get_estado():
     }
 
 def _run_simulation():
+    # Resetea todos los procesos (productos, colas, estado) y re-encadena la línea
+    node = simulation['process_list'].GetHead()
+    while node:
+        node.GetData().Reset()
+        node = node.next
+    prod.set_next_process(simulation['process_list'].GetHead())
+
     head = simulation['process_list'].GetHead()
-    if head is None:
-        return
 
     # Usa prod.cycle() directamente — misma lógica que el standalone
     clock_thread = threading.Thread(target=prod.cycle, daemon=True)
