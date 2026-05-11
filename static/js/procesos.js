@@ -8,7 +8,10 @@ let procesoActivo = 0;
 // ── SocketIO ──────────────────────────────────────────────────────────────────
 socket.on('estado', (data) => { actualizarEstado(data); });
 socket.on('tick',   (data) => { actualizarEstado(data); });
-socket.on('simulacion_terminada', () => mostrarToast('Simulación completada'));
+socket.on('simulacion_terminada', (data) => {
+    actualizarEstado(data);
+    mostrarToast('Simulación completada');
+});
 
 // ── Actualizar estado completo ────────────────────────────────────────────────
 function actualizarEstado(data) {
@@ -52,7 +55,7 @@ function renderSelector(procesos) {
             procesoActivo = i;
             sel.querySelectorAll('.p3-selector-btn').forEach((b, j) =>
                 b.classList.toggle('activo', j === i));
-            renderTareas(procesos[i]);
+            renderTareas(estado.procesos[i]); // siempre lee del estado actual
         });
         sel.appendChild(btn);
     });

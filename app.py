@@ -152,11 +152,13 @@ def _run_simulation():
     head.GetData().StartThreads()
     head.GetData().JoinThreads()
 
-    # Detiene el clock de prod.py
+    # Detiene el clock y el emit loop
     prod.done = True
     simulation['running'] = False
     simulation['done']    = True
-    socketio.emit('simulacion_terminada', {})
+    # Emite el estado final completo para que la UI quede en "completado"
+    simulation['current_t'] = prod.current_t
+    socketio.emit('simulacion_terminada', _get_estado())
 
 def _emit_loop():
     """Solo lee estado y emite al UI. No toca el timing."""
