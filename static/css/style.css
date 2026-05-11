@@ -1,0 +1,399 @@
+/* ── Reset & base ─────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+    --bg:        #111113;
+    --bg-card:   #1c1c1f;
+    --purple:    #7B4FCC;
+    --purple-light: #9D72E8;
+    --purple-dark:  #4B2E8A;
+    --input-bg:  #2a2a2e;
+    --text:      #ffffff;
+    --text-muted:#888899;
+    --radius:    12px;
+    --radius-pill: 999px;
+}
+
+body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh;
+}
+
+/* ── Navbar ───────────────────────────────────────────────────────────────── */
+.navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2.5rem;
+    height: 60px;
+    background: #0e0e10;
+    border-bottom: 1px solid #222228;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.navbar-logo {
+    font-size: 1.4rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, var(--purple-light), var(--purple-dark));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Barra de tiempo */
+.navbar-tiempo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.tiempo-bar {
+    position: relative;
+    width: 220px;
+    height: 26px;
+    background: var(--purple-dark);
+    border-radius: var(--radius-pill);
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+}
+
+.tiempo-label {
+    position: relative;
+    z-index: 2;
+    padding: 0 1rem;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #fff;
+    white-space: nowrap;
+}
+
+.tiempo-fill {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    background: var(--purple-light);
+    border-radius: var(--radius-pill);
+    transition: width 0.8s ease;
+    max-width: 100%;
+}
+
+.tiempo-valor {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+/* Links nav */
+.navbar-links {
+    list-style: none;
+    display: flex;
+    gap: 2rem;
+}
+
+.navbar-links a {
+    text-decoration: none;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.navbar-links a:hover,
+.navbar-links a.active {
+    color: var(--text);
+}
+
+/* ── Hero ─────────────────────────────────────────────────────────────────── */
+.hero {
+    position: relative;
+    height: 160px;
+    display: flex;
+    align-items: center;
+    padding: 0 2.5rem;
+    overflow: hidden;
+    background-size: cover;
+    background-position: top center;
+    background-repeat: no-repeat;
+}
+
+.hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(17,17,19,0.85) 30%, transparent 100%);
+    pointer-events: none;
+}
+
+.hero-home   { background-image: url('/static/img/fondo-home.png'); }
+.hero-tareas { background-image: url('/static/img/fondo-tareas.png'); }
+
+.hero-text {
+    position: relative;
+    z-index: 1;
+}
+
+.hero-text h1 {
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: -1px;
+}
+
+.hero-text p {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-top: 0.3rem;
+}
+
+/* ── Main content ─────────────────────────────────────────────────────────── */
+.main-content {
+    padding: 2rem 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 600px;
+}
+
+/* ── Card ─────────────────────────────────────────────────────────────────── */
+.card {
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    padding: 1.75rem 2rem;
+    border: 1px solid #222228;
+}
+
+.card-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    margin-bottom: 1.25rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* ── Formulario ───────────────────────────────────────────────────────────── */
+.form-group {
+    margin-bottom: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.form-group label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+.form-group input {
+    background: var(--input-bg);
+    border: 1px solid #333340;
+    border-radius: 8px;
+    color: var(--text);
+    padding: 0.6rem 0.9rem;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+}
+
+.form-group input:focus {
+    border-color: var(--purple);
+}
+
+.form-group input::placeholder {
+    color: #444455;
+}
+
+/* Sub-tareas dinámicas */
+.tareas-inputs {
+    border-left: 2px solid var(--purple-dark);
+    padding-left: 1rem;
+    margin-top: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.tarea-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.tarea-row label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+    min-width: 60px;
+}
+
+.tarea-row input {
+    background: var(--input-bg);
+    border: 1px solid #333340;
+    border-radius: 8px;
+    color: var(--text);
+    padding: 0.45rem 0.75rem;
+    font-size: 0.85rem;
+    outline: none;
+    width: 100%;
+    transition: border-color 0.2s;
+}
+
+.tarea-row input:focus { border-color: var(--purple); }
+
+.form-actions {
+    margin-top: 1.25rem;
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+
+/* ── Botón Crear ──────────────────────────────────────────────────────────── */
+.btn-crear {
+    background: var(--purple);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-pill);
+    padding: 0.55rem 2rem;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.btn-crear:hover  { background: var(--purple-light); }
+.btn-crear:active { transform: scale(0.97); }
+
+/* ── Botón Pausa ──────────────────────────────────────────────────────────── */
+.btn-pausa {
+    background: #2a2a2e;
+    border: 1px solid #333340;
+    border-radius: var(--radius-pill);
+    width: 48px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s;
+    color: var(--purple-light);
+    font-size: 0.7rem;
+}
+
+.btn-pausa:hover { background: #333340; }
+.btn-pausa.paused { color: #fff; background: var(--purple-dark); }
+
+/* ── Lista de procesos creados ────────────────────────────────────────────── */
+.proceso-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0;
+    border-bottom: 1px solid #222228;
+}
+
+.proceso-item:last-child { border-bottom: none; }
+
+.proceso-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--purple);
+    flex-shrink: 0;
+}
+
+.proceso-nombre {
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.proceso-meta {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin-left: auto;
+}
+
+/* ── Página Mis Tareas ────────────────────────────────────────────────────── */
+.tareas-card {
+    max-width: 480px;
+}
+
+.tarea-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.55rem 0;
+    border-bottom: 1px solid #222228;
+}
+
+.tarea-item:last-child { border-bottom: none; }
+
+.tarea-nombre {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    min-width: 70px;
+}
+
+.tarea-ciclos {
+    font-size: 1rem;
+    font-weight: 600;
+    min-width: 28px;
+    text-align: center;
+}
+
+.btn-pm {
+    background: var(--purple);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-pill);
+    width: 36px;
+    height: 28px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, transform 0.1s;
+    flex-shrink: 0;
+}
+
+.btn-pm:hover  { background: var(--purple-light); }
+.btn-pm:active { transform: scale(0.93); }
+.btn-pm.minus  { background: rgba(123, 79, 204, 0.45); }
+.btn-pm.minus:hover { background: rgba(123, 79, 204, 0.7); }
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid var(--purple);
+    color: var(--purple-light);
+}
+
+.btn-outline:hover { background: rgba(123, 79, 204, 0.15); }
+
+/* ── Toast / notificaciones ───────────────────────────────────────────────── */
+.toast {
+    position: fixed;
+    bottom: 2rem;
+    right: 2rem;
+    background: var(--purple-dark);
+    color: #fff;
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--radius);
+    font-size: 0.875rem;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.3s, transform 0.3s;
+    pointer-events: none;
+    z-index: 999;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}

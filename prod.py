@@ -64,7 +64,6 @@ class Process:
         self.n_tasks += 1
         t = Task(self.n_tasks, processing_t, self.products)
         self.tasks.Insert(t)
-        self.threads.append(threading.Thread(target=t.Run))
 
     def JoinThreads(self):
         n = len(self.threads)
@@ -96,6 +95,13 @@ class Process:
     # Comienza a ejecutar las tareas
     def StartThreads(self):
         print(f"\033[91m --- {self.name} --- \033[0m")
+
+        # Crea threads frescos cada vez (los threads de Python no se pueden reiniciar)
+        self.threads = []
+        node = self.tasks.GetHead()
+        while node:
+            self.threads.append(threading.Thread(target=node.GetData().Run, daemon=True))
+            node = node.next
 
         for task in self.threads:
             task.start()
@@ -184,33 +190,34 @@ def set_next_process(head):
         tmp = tmp.next
 
 
-process_list = LinkedList()
+if __name__ == '__main__':
+    process_list = LinkedList()
 
-first_p = Process(input("Digite proceso: "), int(input("Numero de productos=")))
-input_tasks(first_p)
-first_p.SetEnabled()
+    first_p = Process(input("Digite proceso: "), int(input("Numero de productos=")))
+    input_tasks(first_p)
+    first_p.SetEnabled()
 
-process_list.Insert(first_p)
+    process_list.Insert(first_p)
 
-while True:
-    req = input("Crear otro proceso? ").lower()
+    while True:
+        req = input("Crear otro proceso? ").lower()
 
-    if req == "s":
-       p = Process(input("Digite proceso: "), int(input("Numero de productos=")))
-       input_tasks(p)
-       process_list.Insert(p)
-    elif req == "n":
-        break
-    else:
-        print("Uso incorrecto: por favor escribir 's' o 'n'")
+        if req == "s":
+           p = Process(input("Digite proceso: "), int(input("Numero de productos=")))
+           input_tasks(p)
+           process_list.Insert(p)
+        elif req == "n":
+            break
+        else:
+            print("Uso incorrecto: por favor escribir 's' o 'n'")
 
-# Asociar procesos entre si
-set_next_process(process_list.GetHead())
+    # Asociar procesos entre si
+    set_next_process(process_list.GetHead())
 
-t1 = threading.Thread(target=cycle)
+    t1 = threading.Thread(target=cycle)
 
-process_list.GetHead().GetData().SetEnabled()
+    process_list.GetHead().GetData().SetEnabled()
 
-t1.start()
-process_list.GetHead().GetData().StartThreads()
-process_list.GetHead().GetData().JoinThreads()
+    t1.start()
+    process_list.GetHead().GetData().StartThreads()
+    process_list.GetHead().GetData().JoinThreads()
