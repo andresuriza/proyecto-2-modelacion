@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}LinProd – Estadísticas{% endblock %}
+
+{% block content %}
+<!-- HERO -->
+<header class="hero hero-estadisticas">
+    <div class="hero-text">
+        <img src="{{ url_for('static', filename='img/est-titulo.png') }}"  alt="Sistema de producción" class="est-hero-h1">
+        <img src="{{ url_for('static', filename='img/est-proyecto.png') }}" alt="Proyecto 2"           class="est-hero-sub">
+        <img src="{{ url_for('static', filename='img/est-label.png') }}"   alt="Estadísticas"         class="est-hero-badge">
+    </div>
+</header>
+
+<div class="est-layout">
+
+    <!-- Estado: simulación no terminada -->
+    <div class="est-waiting" id="est-waiting">
+        <p>La simulación no ha terminado todavía.</p>
+        <p class="est-waiting-sub">Las estadísticas estarán disponibles al completar la línea.</p>
+    </div>
+
+    <!-- Contenido cuando hay datos -->
+    <div id="est-content" style="display:none">
+
+        <!-- ── Métricas globales ───────────────────────────────────────── -->
+        <h2 class="est-section-title">Línea de producción</h2>
+        <div class="est-metrics-row">
+            <div class="est-metric-card">
+                <span class="est-metric-label">Primer producto</span>
+                <span class="est-metric-val" id="m-primer">—</span>
+                <span class="est-metric-unit">ciclo</span>
+            </div>
+            <div class="est-metric-card">
+                <span class="est-metric-label">Último producto</span>
+                <span class="est-metric-val" id="m-ultimo">—</span>
+                <span class="est-metric-unit">ciclo</span>
+            </div>
+            <div class="est-metric-card">
+                <span class="est-metric-label">Promedio de salida</span>
+                <span class="est-metric-val" id="m-promedio">—</span>
+                <span class="est-metric-unit">ciclos</span>
+            </div>
+            <div class="est-metric-card">
+                <span class="est-metric-label">Tiempo total</span>
+                <span class="est-metric-val" id="m-total">—</span>
+                <span class="est-metric-unit">ciclos</span>
+            </div>
+            <div class="est-metric-card">
+                <span class="est-metric-label">Espera promedio</span>
+                <span class="est-metric-val" id="m-espera">—</span>
+                <span class="est-metric-unit">ciclos</span>
+            </div>
+        </div>
+
+        <!-- ── Cuellos de botella ──────────────────────────────────────── -->
+        <h2 class="est-section-title">Cuellos de botella</h2>
+        <div class="est-bottleneck-row">
+            <div class="letra-metal est-letra-bn" id="est-letra-bn">—</div>
+            <div class="est-bn-card">
+                <span class="est-bn-title">Mayor espera promedio</span>
+                <span class="est-bn-proc" id="bn-nombre">—</span>
+                <div class="est-bn-val">
+                    <span id="bn-espera">—</span>
+                    <small>ciclos prom.</small>
+                </div>
+            </div>
+            <div class="est-bn-card">
+                <span class="est-bn-title">Mayor espera máxima</span>
+                <span class="est-bn-proc" id="max-nombre">—</span>
+                <div class="est-bn-val">
+                    <span id="max-espera">—</span>
+                    <small>ciclos máx.</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── Tabla por tarea ─────────────────────────────────────────── -->
+        <h2 class="est-section-title">Detalle por tarea</h2>
+        <div class="est-table-section">
+            <table class="est-table">
+                <thead>
+                    <tr>
+                        <th>Proceso</th>
+                        <th>Tarea</th>
+                        <th>T. proceso</th>
+                        <th>Espera prom.</th>
+                        <th>Espera máx.</th>
+                        <th>Completados</th>
+                    </tr>
+                </thead>
+                <tbody id="est-tbody"></tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/estadisticas.js') }}"></script>
+{% endblock %}

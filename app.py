@@ -38,6 +38,68 @@ def estadisticas():
 
 # ── API ────────────────────────────────────────────────────────────────────────
 
+@app.route('/api/estadisticas', methods=['GET'])
+def estadisticas_api():
+    if not simulation['done']:
+        return jsonify({'disponible': False})
+
+    task_stats = []
+    last_task_records = []
+
+    node = simulation['process_list'].GetHead()
+    while node:
+        p = node.GetData()
+        t_node = p.tasks.GetHead()
+        # Encontrar la última tarea de este proceso
+        last_t_node = t_node
+        while last_t_node.next:
+            last_t_node = last_t_node.next
+
+        t_node = p.tasks.GetHead()
+        while t_node:
+            t = t_node.GetData()
+            records = t._records
+            if records:
+                waits = [r['wait'] for r in records]
+                task_stats.append({
+                    'proceso':         p.name,
+                    'tarea':           t.n,
+                    'tiempo_proceso':  t.processing_t,
+                    'espera_promedio': round(sum(waits) / len(waits), 2),
+                    'espera_max':      max(waits),
+                    'completados':     len(records)
+                })
+            # Registros de la última tarea del último proceso = tiempos de salida de la línea
+            if t_node == last_t_node and node.next is None:
+                last_task_records = records
+            t_node = t_node.next
+        node = node.next
+
+    if not last_task_records or not task_stats:
+        return jsonify({'disponible': False})
+
+    exit_times = [r['done_at'] for r in last_task_records]
+    all_waits  = [r['wait'] for ts in task_stats for r in []]  # placeholder
+    # Recalcular espera global desde task_stats
+    total_wait = sum(ts['espera_promedio'] * ts['completados'] for ts in task_stats)
+    total_comp = sum(ts['completados'] for ts in task_stats)
+    espera_global = round(total_wait / total_comp, 2) if total_comp else 0
+
+    cuello    = max(task_stats, key=lambda x: x['espera_promedio'])
+    max_espera = max(task_stats, key=lambda x: x['espera_max'])
+
+    return jsonify({
+        'disponible':          True,
+        't_primer_producto':   min(exit_times),
+        't_ultimo_producto':   max(exit_times),
+        't_promedio':          round(sum(exit_times) / len(exit_times), 2),
+        'tiempo_total':        simulation['current_t'],
+        'espera_promedio':     espera_global,
+        'cuello_botella':      {'proceso': cuello['proceso'],    'tarea': cuello['tarea'],    'espera_promedio': cuello['espera_promedio']},
+        'tarea_max_espera':    {'proceso': max_espera['proceso'],'tarea': max_espera['tarea'],'espera_max': max_espera['espera_max']},
+        'task_stats':          task_stats
+    })
+
 @app.route('/api/crear-proceso', methods=['POST'])
 def crear_proceso():
     data = request.get_json()

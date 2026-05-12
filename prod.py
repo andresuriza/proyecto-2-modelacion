@@ -1,5 +1,6 @@
 import threading
 import time
+from collections import deque
 
 current_t = 0
 done = False
@@ -67,6 +68,7 @@ class Process:
     def CreateTask(self, processing_t):
         self.n_tasks += 1
         t = Task(self.n_tasks, processing_t, self.products)
+        t.process_name = self.name
         self.tasks.Insert(t)
 
     def JoinThreads(self):
@@ -120,6 +122,9 @@ class Task:
         self.is_processing = False
         self.queue_n       = 0
         self.current       = 1
+        self.process_name  = ''
+        self._queue_times  = deque()  # timestamp de llegada de cada producto a la cola
+        self._records      = []       # historial: {product, queued_at, done_at, wait}
 
     def Reset(self):
         self.products      = self._initial_products
@@ -127,14 +132,16 @@ class Task:
         self.is_processing = False
         self.current       = 1
         self.next          = None
+        self._queue_times  = deque()
+        self._records      = []
 
     def SetNext(self, next):
         self.next = next
 
     def Queue(self):
+        self._queue_times.append(current_t)
         if not self.is_processing:
             self.is_processing = True
-            
         self.queue_n += 1
     
     def Run(self):
@@ -163,6 +170,15 @@ class Task:
                         self.queue_n -= 1
                         print(f"Encolados: {self.queue_n}")
                         lock.release()
+                        # Registrar estadísticas del producto completado
+                        queued_at = self._queue_times.popleft() if self._queue_times else current_t
+                        self._records.append({
+                            'product':   self.current,
+                            'queued_at': int(queued_at),
+                            'done_at':   int(current_t),
+                            'wait':      max(0, int(current_t) - self.processing_t - int(queued_at))
+                        })
+
                         # Pasa a siguiente producto
                         self.current += 1
                         # El tiempo empieza a contar a partir de ahora

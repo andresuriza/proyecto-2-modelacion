@@ -632,3 +632,172 @@ body {
     opacity: 1;
     transform: translateY(0);
 }
+
+/* ── Página Estadísticas ──────────────────────────────────────────────────── */
+.hero-estadisticas { background-image: url('/static/img/fondo-home.png'); }
+
+.est-hero-h1    { height: 52px;  display: block; margin-bottom: 0.3rem; }
+.est-hero-sub   { height: 28px;  display: block; margin-bottom: 0.3rem; }
+.est-hero-badge { height: 20px;  display: block; }
+
+.est-layout {
+    padding: 2rem 2.5rem;
+    max-width: 1200px;
+}
+
+/* Estado de espera */
+.est-waiting {
+    text-align: center;
+    padding: 5rem 0;
+    font-size: 1.05rem;
+    color: var(--text-muted);
+}
+
+.est-waiting-sub {
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+    color: #555566;
+}
+
+/* Títulos de sección */
+.est-section-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    letter-spacing: -0.5px;
+    margin: 0 0 1rem;
+}
+
+/* ── Fila métricas globales ───────────────────────────────────────────────── */
+.est-metrics-row {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.est-metric-card {
+    background: var(--bg-card);
+    border: 1px solid #222228;
+    border-radius: var(--radius);
+    padding: 1.25rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.35rem;
+    text-align: center;
+}
+
+.est-metric-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+.est-metric-val {
+    font-size: 2.4rem;
+    font-weight: 800;
+    color: var(--purple-light);
+    line-height: 1;
+}
+
+.est-metric-unit {
+    font-size: 0.72rem;
+    color: #555566;
+}
+
+/* ── Sección cuello de botella ────────────────────────────────────────────── */
+.est-bottleneck-row {
+    display: grid;
+    grid-template-columns: auto 1fr 1fr;
+    gap: 2rem;
+    align-items: center;
+    background: var(--bg-card);
+    border: 1px solid #222228;
+    border-radius: var(--radius);
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+}
+
+.est-letra-bn {
+    font-size: 7.5rem;
+    margin: 0;
+    line-height: 1;
+}
+
+.est-bn-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.est-bn-title {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+.est-bn-proc {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.est-bn-val {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+}
+
+.est-bn-val span {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--purple-light);
+}
+
+.est-bn-val small {
+    font-size: 0.75rem;
+    color: #555566;
+}
+
+/* ── Tabla detallada ──────────────────────────────────────────────────────── */
+.est-table-section {
+    background: var(--bg-card);
+    border: 1px solid #222228;
+    border-radius: var(--radius);
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.est-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+.est-table th {
+    padding: 0.75rem 1.25rem;
+    text-align: left;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    background: #16161a;
+    border-bottom: 1px solid #222228;
+}
+
+.est-table td {
+    padding: 0.7rem 1.25rem;
+    border-bottom: 1px solid #1a1a1e;
+    color: var(--text);
+}
+
+.est-table tr:last-child td { border-bottom: none; }
+
+.est-table tr.cuello td {
+    background: rgba(123, 79, 204, 0.1);
+    color: var(--purple-light);
+    font-weight: 600;
+}
