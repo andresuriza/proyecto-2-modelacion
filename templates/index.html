@@ -1,30 +1,7 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LinProd</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}LinProd{% endblock %}
 
-    <!-- NAVBAR -->
-    <nav class="navbar">
-        <div class="navbar-logo">YONI</div>
-        <div class="navbar-tiempo">
-            <div class="tiempo-bar">
-                <span class="tiempo-label">Tiempo</span>
-                <div class="tiempo-fill" id="tiempo-fill" style="width: 0%"></div>
-            </div>
-            <span class="tiempo-valor" id="tiempo-valor">t = 0</span>
-        </div>
-        <ul class="navbar-links">
-            <li><a href="/" class="active">Home</a></li>
-            <li><a href="/procesos">Procesos</a></li>
-            <li><a href="/estadisticas">Estadísticas</a></li>
-        </ul>
-    </nav>
-
+{% block content %}
     <!-- HERO -->
     <section class="hero hero-home">
         <div class="hero-text">
@@ -68,8 +45,8 @@
         </div>
 
     </main>
+{% endblock %}
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+{% block scripts %}
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
-</body>
-</html>
+{% endblock %}
