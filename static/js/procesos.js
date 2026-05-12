@@ -19,6 +19,12 @@ function actualizarEstado(data) {
     renderSelector(data.procesos);
     renderTareas(data.procesos[procesoActivo]);
     actualizarPausa(data.paused, data.running);
+    actualizarLetra(data.procesos[procesoActivo]);
+}
+
+function actualizarLetra(proceso) {
+    const el = document.getElementById('letra-proceso');
+    if (el && proceso) el.textContent = proceso.nombre;
 }
 
 // ── Barra de tiempo ───────────────────────────────────────────────────────────
@@ -60,7 +66,8 @@ function renderSelector(procesos) {
             procesoActivo = i;
             sel.querySelectorAll('.p3-selector-btn').forEach((b, j) =>
                 b.classList.toggle('activo', j === i));
-            renderTareas(estado.procesos[i]); // siempre lee del estado actual
+            renderTareas(estado.procesos[i]);
+            actualizarLetra(estado.procesos[i]);
         });
         sel.appendChild(btn);
     });

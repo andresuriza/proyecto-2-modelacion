@@ -366,6 +366,34 @@ body {
     user-select: none;
 }
 
+/* ── Letra metálica reutilizable ─────────────────────────────────────────── */
+.letra-metal {
+    font-size: 15.5rem;
+    font-weight: 900;
+    letter-spacing: -3px;
+    line-height: 1;
+    margin: 0.5rem 0 1.5rem;
+    background: linear-gradient(
+        155deg,
+        #ffffff  0%,
+        #d0d0d0 12%,
+        #787878 28%,
+        #f0f0f0 42%,
+        #b0b0b0 50%,
+        #efefef 62%,
+        #606060 76%,
+        #d8d8d8 88%,
+        #ffffff 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 6px 18px rgba(0, 0, 0, 0.7));
+    pointer-events: none;
+    user-select: none;
+    word-break: break-all;
+}
+
 .p3-selector {
     display: flex;
     flex-direction: column;
