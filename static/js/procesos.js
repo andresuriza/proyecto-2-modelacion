@@ -1,5 +1,4 @@
-const socket = io();
-
+// socket viene de base.html como window.socket
 const CIRCUM = 69.12; // 2 * π * 11
 
 let estado = { procesos: [], tiempo: 0 };
@@ -149,13 +148,6 @@ document.getElementById('btn-iniciar')?.addEventListener('click', async () => {
     const res  = await fetch('/api/iniciar', { method: 'POST' });
     const data = await res.json();
     mostrarToast(data.ok ? 'Simulación iniciada' : data.mensaje);
-});
-
-// ── Botón pausa ───────────────────────────────────────────────────────────────
-document.getElementById('btn-pausa')?.addEventListener('click', async () => {
-    const res  = await fetch('/api/pausar', { method: 'POST' });
-    const data = await res.json();
-    actualizarPausa(data.paused, data.running);
 });
 
 function actualizarPausa(paused, running) {

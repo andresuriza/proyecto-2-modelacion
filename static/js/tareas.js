@@ -1,4 +1,4 @@
-const socket = io();
+// socket viene de base.html como window.socket
 
 const proceso = JSON.parse(sessionStorage.getItem('proceso_pendiente') || 'null');
 

@@ -1,4 +1,4 @@
-const socket = io();
+// socket viene de base.html como window.socket
 
 // ── Al cargar Home, mostrar procesos ya creados ───────────────────────────────
 cargarProcesosExistentes();

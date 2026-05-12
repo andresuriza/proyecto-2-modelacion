@@ -83,7 +83,7 @@ def iniciar():
 def pausar():
     simulation['paused'] = not simulation['paused']
     prod.paused = simulation['paused']
-    return jsonify({'paused': simulation['paused'], 'running': simulation['running']})
+    return jsonify(_get_estado())
 
 @app.route('/api/estado', methods=['GET'])
 def estado():

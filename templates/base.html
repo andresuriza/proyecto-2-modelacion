@@ -32,6 +32,42 @@
     {% block content %}{% endblock %}
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+        // Socket global compartido — una sola conexión por página
+        window.socket = io();
+
+        function _navbarActualizar(data) {
+            const fill  = document.getElementById('tiempo-fill');
+            const valor = document.getElementById('tiempo-valor');
+            const btn   = document.getElementById('btn-pausa');
+
+            if (valor) valor.textContent = `t = ${data.tiempo}`;
+
+            if (fill && data.procesos) {
+                let tmax = 0;
+                data.procesos.forEach(p => p.tareas.forEach(t => { tmax += t.tiempo_proceso; }));
+                tmax = tmax * (data.procesos[0]?.tareas[0]?.total || 1);
+                const pct = tmax > 0 ? Math.min((data.tiempo / tmax) * 100, 100) : 0;
+                fill.style.width = pct + '%';
+            }
+
+            if (btn) {
+                btn.disabled = !data.running;
+                btn.classList.toggle('paused', !!data.paused);
+                btn.querySelector('.pausa-icon').innerHTML = data.paused ? '&#9646;&#9646;' : '&#9654;';
+            }
+        }
+
+        socket.on('estado',               _navbarActualizar);
+        socket.on('tick',                 _navbarActualizar);
+        socket.on('simulacion_terminada', _navbarActualizar);
+
+        document.getElementById('btn-pausa').addEventListener('click', async () => {
+            const res  = await fetch('/api/pausar', { method: 'POST' });
+            const data = await res.json();
+            _navbarActualizar(data);
+        });
+    </script>
     {% block scripts %}{% endblock %}
 </body>
 </html>
