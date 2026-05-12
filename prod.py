@@ -50,6 +50,7 @@ class Process:
         self.name = name
         self.n_tasks = 0
         self.products = products
+        self.is_first = False
         self.threads = []
         self.tasks = LinkedList()
 
@@ -66,15 +67,8 @@ class Process:
         self.tasks.Insert(t)
 
     def JoinThreads(self):
-        n = len(self.threads)
-        for i in range(n):
-            self.threads[i].join()
-
-            # Si es la ultima tarea, iniciar proximo proceso
-            if (i == (n - 1)):
-                if self.next != None:
-                    self.next.StartThreads()
-                    self.next.JoinThreads()
+        for t in self.threads:
+            t.join()
 
     def Reset(self):
         self.next = None
@@ -82,21 +76,20 @@ class Process:
         while node:
             node.GetData().Reset()
             node = node.next
-        self.QueueProducts()
+        self.QueueProducts(queue=self.is_first)
 
-    def QueueProducts(self):
+    def QueueProducts(self, queue=True):
         head = self.tasks.GetHead()
 
-        # Se encolan productos a la primera tarea
-        for _ in range(self.products):
-            head.GetData().Queue()
+        # Solo el primer proceso encola productos
+        if queue:
+            for _ in range(self.products):
+                head.GetData().Queue()
 
+        # Siempre enlaza tareas dentro del proceso
         while head != None:
-
-            # Tarea referencia a la siguiente
             if head.next != None:
                 head.GetData().SetNext(head.next.GetData())
-
             head = head.next
 
 
@@ -201,37 +194,52 @@ def set_next_process(head):
 
     while tmp.next != None:
         tmp.GetData().SetNext(tmp.next.GetData())
+
+        # Enlaza la última tarea de este proceso con la primera del siguiente
+        last_node = tmp.GetData().tasks.GetHead()
+        while last_node.next:
+            last_node = last_node.next
+        next_first = tmp.next.GetData().tasks.GetHead()
+        if next_first:
+            last_node.GetData().SetNext(next_first.GetData())
+
         tmp = tmp.next
 
 
 if __name__ == '__main__':
     process_list = LinkedList()
 
-    first_p = Process(input("Digite proceso: "), int(input("Numero de productos=")))
+    cantidad_global = int(input("Numero de productos (global)= "))
+
+    first_p = Process(input("Digite proceso: "), cantidad_global)
+    first_p.is_first = True
     input_tasks(first_p)
     first_p.SetEnabled()
-
     process_list.Insert(first_p)
 
     while True:
         req = input("Crear otro proceso? ").lower()
-
         if req == "s":
-           p = Process(input("Digite proceso: "), int(input("Numero de productos=")))
-           input_tasks(p)
-           process_list.Insert(p)
+            p = Process(input("Digite proceso: "), cantidad_global)
+            input_tasks(p)
+            process_list.Insert(p)
         elif req == "n":
             break
         else:
             print("Uso incorrecto: por favor escribir 's' o 'n'")
 
-    # Asociar procesos entre si
     set_next_process(process_list.GetHead())
 
     t1 = threading.Thread(target=cycle)
-
-    process_list.GetHead().GetData().SetEnabled()
-
     t1.start()
-    process_list.GetHead().GetData().StartThreads()
-    process_list.GetHead().GetData().JoinThreads()
+
+    # Arranca todos los procesos en pipeline
+    node = process_list.GetHead()
+    while node:
+        node.GetData().StartThreads()
+        node = node.next
+
+    node = process_list.GetHead()
+    while node:
+        node.GetData().JoinThreads()
+        node = node.next

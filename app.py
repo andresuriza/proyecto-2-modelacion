@@ -14,7 +14,8 @@ simulation = {
     'paused': False,
     'current_t': 0,
     'done': False,
-    'processes_config': []
+    'processes_config': [],
+    'cantidad_global': 0
 }
 
 # ── Rutas ──────────────────────────────────────────────────────────────────────
@@ -41,13 +42,20 @@ def estadisticas():
 def crear_proceso():
     data = request.get_json()
     nombre        = data.get('nombre')
-    cantidad      = int(data.get('cantidad_producto'))
     tareas_config = data.get('tareas', [])
 
+    is_first = simulation['process_list'].GetHead() is None
+    if is_first:
+        cantidad = int(data.get('cantidad_producto', 1))
+        simulation['cantidad_global'] = cantidad
+    else:
+        cantidad = simulation['cantidad_global']
+
     p = prod.Process(nombre, cantidad)
+    p.is_first = is_first
     for t in tareas_config:
         p.CreateTask(int(t['tiempo_proceso']))
-    p.QueueProducts()
+    p.QueueProducts(queue=is_first)
 
     simulation['process_list'].Insert(p)
     simulation['processes_config'].append(data)
@@ -94,14 +102,17 @@ def procesos_creados():
         es_final   = (i == total - 1)
         lista.append({
             'nombre':   p.name,
-            'productos': p.products,
+            'productos': simulation['cantidad_global'],
             'n_tareas':  p.n_tasks,
             'inicial':   es_inicial,
             'final':     es_final
         })
         node = node.next
         i += 1
-    return jsonify(lista)
+    return jsonify({
+        'procesos': lista,
+        'cantidad_global': simulation['cantidad_global']
+    })
 
 # ── Lógica de simulación ───────────────────────────────────────────────────────
 
@@ -120,6 +131,7 @@ def _get_estado():
                 'en_cola':        t.queue_n,
                 'tiempo_proceso': t.processing_t,
                 'completados':    p.products - t.products,
+                'total':          p.products,
                 'producto_actual': t.current if t.is_processing else None
             })
             t_node = t_node.next
@@ -132,31 +144,40 @@ def _get_estado():
     }
 
 def _run_simulation():
-    # Resetea todos los procesos (productos, colas, estado) y re-encadena la línea
+    # Resetea todos los procesos; marca cuál es el primero para el encolado inicial
     node = simulation['process_list'].GetHead()
+    is_first = True
     while node:
-        node.GetData().Reset()
+        p = node.GetData()
+        p.is_first = is_first
+        p.Reset()
+        is_first = False
         node = node.next
+
+    # Re-encadena la línea: también une última tarea de P[i] con primera de P[i+1]
     prod.set_next_process(simulation['process_list'].GetHead())
 
-    head = simulation['process_list'].GetHead()
-
-    # Usa prod.cycle() directamente — misma lógica que el standalone
+    # Clock y emit loop
     clock_thread = threading.Thread(target=prod.cycle, daemon=True)
     clock_thread.start()
-
-    # Loop separado solo para emitir estado al UI (no interfiere con el timing)
     emit_thread = threading.Thread(target=_emit_loop, daemon=True)
     emit_thread.start()
 
-    head.GetData().StartThreads()
-    head.GetData().JoinThreads()
+    # Arranca TODOS los procesos simultáneamente (pipeline)
+    node = simulation['process_list'].GetHead()
+    while node:
+        node.GetData().StartThreads()
+        node = node.next
 
-    # Detiene el clock y el emit loop
+    # Espera a que todos terminen (P1 termina antes que P2, etc.)
+    node = simulation['process_list'].GetHead()
+    while node:
+        node.GetData().JoinThreads()
+        node = node.next
+
     prod.done = True
     simulation['running'] = False
     simulation['done']    = True
-    # Emite el estado final completo para que la UI quede en "completado"
     simulation['current_t'] = prod.current_t
     socketio.emit('simulacion_terminada', _get_estado())
 

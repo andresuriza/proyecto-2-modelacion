@@ -4,9 +4,15 @@ const socket = io();
 cargarProcesosExistentes();
 
 async function cargarProcesosExistentes() {
-    const res   = await fetch('/api/procesos-creados');
-    const lista = await res.json();
-    if (lista.length > 0) renderLinea(lista);
+    const res  = await fetch('/api/procesos-creados');
+    const data = await res.json();
+    if (data.procesos && data.procesos.length > 0) {
+        renderLinea(data.procesos, data.cantidad_global);
+        // Ya hay procesos: el campo cantidad ya no aplica
+        const grupoCantidad = document.getElementById('grupo-cantidad');
+        grupoCantidad.style.display = 'none';
+        document.getElementById('cantidad-producto').removeAttribute('required');
+    }
 }
 
 // ── Formulario nuevo proceso ──────────────────────────────────────────────────
@@ -14,10 +20,14 @@ document.getElementById('form-proceso')?.addEventListener('submit', function (e)
     e.preventDefault();
 
     const nombre   = document.getElementById('nombre-proceso').value.trim();
-    const cantidad = parseInt(document.getElementById('cantidad-producto').value);
     const nTareas  = parseInt(document.getElementById('cantidad-tareas').value);
+    const grupoCantidad = document.getElementById('grupo-cantidad');
+    const cantidadInput = document.getElementById('cantidad-producto');
+    const cantidad = grupoCantidad.style.display === 'none'
+        ? 0  // backend usará cantidad_global
+        : parseInt(cantidadInput.value);
 
-    if (!nombre || !cantidad || !nTareas) {
+    if (!nombre || !nTareas || (grupoCantidad.style.display !== 'none' && !cantidad)) {
         mostrarToast('Completa todos los campos');
         return;
     }
@@ -27,11 +37,18 @@ document.getElementById('form-proceso')?.addEventListener('submit', function (e)
 });
 
 // ── Render lista de procesos ──────────────────────────────────────────────────
-function renderLinea(lista) {
+function renderLinea(lista, cantidadGlobal) {
     const card  = document.getElementById('card-linea');
     const linea = document.getElementById('linea-lista');
     card.style.display = 'block';
     linea.innerHTML = '';
+
+    if (cantidadGlobal) {
+        const resumen = document.createElement('p');
+        resumen.style.cssText = 'font-size:0.82rem;color:var(--text-muted);margin-bottom:0.75rem';
+        resumen.textContent = `${cantidadGlobal} producto(s) recorren toda la línea`;
+        linea.appendChild(resumen);
+    }
 
     lista.forEach(p => {
         const badges = [];
@@ -43,7 +60,7 @@ function renderLinea(lista) {
         item.innerHTML = `
             <div class="proceso-dot"></div>
             <span class="proceso-nombre">${p.nombre} ${badges.join('')}</span>
-            <span class="proceso-meta">${p.productos} productos · ${p.n_tareas} tareas</span>
+            <span class="proceso-meta">${p.n_tareas} tarea(s)</span>
         `;
         linea.appendChild(item);
     });

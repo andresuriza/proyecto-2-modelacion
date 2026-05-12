@@ -33,9 +33,15 @@ function actualizarTiempo(t) {
 }
 
 function calcularTiempoMax() {
-    let max = 0;
-    estado.procesos.forEach(p => p.tareas.forEach(t => { max += t.tiempo_proceso; }));
-    return max || 50;
+    // Tiempo estimado: suma de tiempos de todas las tareas de la cadena * N productos
+    // (aproximación conservadora para la barra de progreso)
+    let sumaTareas = 0;
+    let total = 0;
+    estado.procesos.forEach(p => p.tareas.forEach(t => {
+        sumaTareas += t.tiempo_proceso;
+        total = t.total || total;
+    }));
+    return sumaTareas > 0 ? sumaTareas * (total || 1) : 50;
 }
 
 // ── Selector de procesos (panel izquierdo) ────────────────────────────────────
@@ -120,8 +126,7 @@ function actualizarCard(card, tarea, proceso) {
     const prodLabel = card.querySelector('.tarea-producto');
 
     const completados = tarea.completados || 0;
-    const totalProd   = completados + (tarea.en_cola || 0) + (tarea.procesando ? 1 : 0);
-    const pct         = totalProd > 0 ? completados / totalProd : 0;
+    const pct         = tarea.total > 0 ? completados / tarea.total : 0;
     fill.style.strokeDashoffset = CIRCUM * (1 - pct);
 
     if (tarea.procesando && tarea.producto_actual != null) {
