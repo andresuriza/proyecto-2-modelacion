@@ -18,6 +18,9 @@
                 <div class="tiempo-fill" id="tiempo-fill" style="width: 0%"></div>
             </div>
             <span class="tiempo-valor" id="tiempo-valor">t = 0</span>
+            <button class="btn-pausa" id="btn-pausa" title="Pausar" disabled>
+                <span class="pausa-icon">&#9654;</span>
+            </button>
         </div>
         <ul class="navbar-links">
             <li><a href="/"             {% if request.endpoint == 'home'         %}class="active"{% endif %}>Home</a></li>

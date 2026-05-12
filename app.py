@@ -71,7 +71,9 @@ def iniciar():
 
     simulation['running'] = True
     simulation['done']    = False
+    simulation['paused']  = False
     prod.done             = False
+    prod.paused           = False
     prod.current_t        = 0
 
     threading.Thread(target=_run_simulation, daemon=True).start()
@@ -80,7 +82,8 @@ def iniciar():
 @app.route('/api/pausar', methods=['POST'])
 def pausar():
     simulation['paused'] = not simulation['paused']
-    return jsonify({'paused': simulation['paused']})
+    prod.paused = simulation['paused']
+    return jsonify({'paused': simulation['paused'], 'running': simulation['running']})
 
 @app.route('/api/estado', methods=['GET'])
 def estado():
@@ -140,7 +143,8 @@ def _get_estado():
     return {
         'procesos': procesos,
         'tiempo':   simulation['current_t'],
-        'paused':   simulation['paused']
+        'paused':   simulation['paused'],
+        'running':  simulation['running']
     }
 
 def _run_simulation():

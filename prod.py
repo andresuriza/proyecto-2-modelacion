@@ -3,12 +3,15 @@ import time
 
 current_t = 0
 done = False
+paused = False
 lock = threading.Lock()
 
 # Contador de ciclos
 def cycle():
     while not done:
         global current_t
+        while paused:
+            time.sleep(0.1)
         lock.acquire()
         print(f"---- Tiempo: {current_t}-----")
         lock.release()
@@ -143,6 +146,9 @@ class Task:
                 break
 
             time.sleep(0.05)  # evita busy-wait que bloquea el GIL
+
+            while paused:
+                time.sleep(0.1)
 
             if self.is_processing:
                 # Mientras queden productos

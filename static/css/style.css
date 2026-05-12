@@ -285,8 +285,9 @@ body {
     font-size: 0.7rem;
 }
 
-.btn-pausa:hover { background: #333340; }
+.btn-pausa:hover:not(:disabled) { background: #333340; }
 .btn-pausa.paused { color: #fff; background: var(--purple-dark); }
+.btn-pausa:disabled { opacity: 0.35; cursor: not-allowed; }
 
 /* ── Lista de procesos creados ────────────────────────────────────────────── */
 .proceso-item {

@@ -19,7 +19,7 @@ function actualizarEstado(data) {
     actualizarTiempo(data.tiempo);
     renderSelector(data.procesos);
     renderTareas(data.procesos[procesoActivo]);
-    actualizarPausa(data.paused);
+    actualizarPausa(data.paused, data.running);
 }
 
 // ── Barra de tiempo ───────────────────────────────────────────────────────────
@@ -155,12 +155,13 @@ document.getElementById('btn-iniciar')?.addEventListener('click', async () => {
 document.getElementById('btn-pausa')?.addEventListener('click', async () => {
     const res  = await fetch('/api/pausar', { method: 'POST' });
     const data = await res.json();
-    actualizarPausa(data.paused);
+    actualizarPausa(data.paused, data.running);
 });
 
-function actualizarPausa(paused) {
-    const btn  = document.getElementById('btn-pausa');
+function actualizarPausa(paused, running) {
+    const btn = document.getElementById('btn-pausa');
     if (!btn) return;
+    btn.disabled = !running;
     btn.classList.toggle('paused', paused);
     btn.querySelector('.pausa-icon').innerHTML = paused ? '&#9646;&#9646;' : '&#9654;';
 }
