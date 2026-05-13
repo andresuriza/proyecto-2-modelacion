@@ -837,3 +837,11 @@ body {
 }
 
 .reiniciar-input:focus { border-color: var(--purple); }
+
+.btn-borrar {
+    background: transparent;
+    border: 1px solid #cc4444;
+    color: #cc4444;
+}
+
+.btn-borrar:hover { background: rgba(204, 68, 68, 0.15); }

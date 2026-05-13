@@ -141,6 +141,33 @@ def iniciar():
     threading.Thread(target=_run_simulation, daemon=True).start()
     return jsonify({'ok': True})
 
+@app.route('/api/reset-linea', methods=['POST'])
+def reset_linea():
+    if simulation['running'] and not simulation['paused']:
+        return jsonify({'ok': False, 'mensaje': 'Pausá la simulación antes de borrar la línea'})
+
+    # Imprimir procesos que se van a borrar
+    nombres = []
+    node = simulation['process_list'].GetHead()
+    while node:
+        nombres.append(node.GetData().name)
+        node = node.next
+    print(f"=== Línea borrada: {nombres if nombres else '(vacía)'} ===")
+
+    prod.paused                    = False
+    prod.done                      = True   # señal para que todos los threads salgan
+    simulation['process_list']     = prod.LinkedList()
+    simulation['processes_config'] = []
+    simulation['cantidad_global']  = 0
+    simulation['running']          = False
+    simulation['paused']           = False
+    simulation['done']             = False
+    simulation['current_t']        = 0
+    prod.current_t                 = 0
+    # prod.done se resetea en iniciar/reiniciar, no acá
+    socketio.emit('estado', _get_estado())
+    return jsonify({'ok': True})
+
 @app.route('/api/reiniciar', methods=['POST'])
 def reiniciar():
     if simulation['running']:
@@ -242,6 +269,7 @@ def _get_estado():
     }
 
 def _run_simulation():
+    print(f"=== Iniciando simulación: {simulation['cantidad_global']} producto(s) ===")
     # Resetea todos los procesos; marca cuál es el primero para el encolado inicial
     node = simulation['process_list'].GetHead()
     is_first = True

@@ -151,6 +151,8 @@ class Task:
             # Ya termino, no mas bucle
             if self.products == 0:
                 break
+            if done:
+                break
 
             time.sleep(0.05)  # evita busy-wait que bloquea el GIL
 

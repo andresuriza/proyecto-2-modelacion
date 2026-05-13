@@ -189,6 +189,18 @@ function actualizarPausa(paused, running) {
     btn.querySelector('.pausa-icon').innerHTML = paused ? '&#9646;&#9646;' : '&#9654;';
 }
 
+// ── Botón borrar línea ────────────────────────────────────────────────────────
+document.getElementById('btn-borrar-linea')?.addEventListener('click', async () => {
+    const res  = await fetch('/api/reset-linea', { method: 'POST' });
+    const data = await res.json();
+    if (data.ok) {
+        mostrarToast('Línea borrada');
+        setTimeout(() => window.location.href = '/', 1200);
+    } else {
+        mostrarToast(data.mensaje);
+    }
+});
+
 // ── Toast ─────────────────────────────────────────────────────────────────────
 function mostrarToast(msg) {
     let toast = document.querySelector('.toast');
