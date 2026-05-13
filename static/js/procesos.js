@@ -55,22 +55,38 @@ function renderSelector(procesos) {
     const sel = document.getElementById('p3-selector');
     if (procesos.length === 0) return;
 
-    // Solo reconstruye si cambia el número de procesos
-    if (sel.children.length === procesos.length) return;
+    // Construir botones solo la primera vez
+    if (sel.children.length !== procesos.length) {
+        sel.innerHTML = '';
+        procesos.forEach((p, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'p3-selector-btn' + (i === procesoActivo ? ' activo' : '');
 
-    sel.innerHTML = '';
-    procesos.forEach((p, i) => {
-        const btn = document.createElement('button');
-        btn.className = 'p3-selector-btn' + (i === procesoActivo ? ' activo' : '');
-        btn.textContent = p.nombre;
-        btn.addEventListener('click', () => {
-            procesoActivo = i;
-            sel.querySelectorAll('.p3-selector-btn').forEach((b, j) =>
-                b.classList.toggle('activo', j === i));
-            renderTareas(estado.procesos[i]);
-            actualizarLetra(estado.procesos[i]);
+            let badges = '';
+            if (i === 0)                    badges += '<span class="badge-sel">Inicial</span>';
+            if (i === procesos.length - 1)  badges += '<span class="badge-sel final">Final</span>';
+
+            btn.innerHTML = `<span class="sel-nombre">${p.nombre}</span>${badges}<span class="sel-completo" style="display:none"> — Completo</span>`;
+
+            btn.addEventListener('click', () => {
+                procesoActivo = i;
+                sel.querySelectorAll('.p3-selector-btn').forEach((b, j) =>
+                    b.classList.toggle('activo', j === i));
+                renderTareas(estado.procesos[i]);
+                actualizarLetra(estado.procesos[i]);
+            });
+            sel.appendChild(btn);
         });
-        sel.appendChild(btn);
+    }
+
+    // Actualizar estado "Completo" en cada tick
+    procesos.forEach((p, i) => {
+        const btn = sel.children[i];
+        if (!btn) return;
+        const ultima = p.tareas[p.tareas.length - 1];
+        const completo = ultima && ultima.total > 0 && ultima.completados >= ultima.total;
+        btn.querySelector('.sel-completo').style.display = completo ? 'inline' : 'none';
+        btn.classList.toggle('sel-btn-completo', completo);
     });
 }
 

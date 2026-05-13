@@ -420,6 +420,34 @@ body {
     color: var(--text);
 }
 
+.badge-sel {
+    font-size: 0.6rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    background: rgba(123, 79, 204, 0.3);
+    color: var(--purple-light);
+    border-radius: 4px;
+    padding: 0.05rem 0.35rem;
+    margin-left: 0.4rem;
+    vertical-align: middle;
+}
+
+.badge-sel.final {
+    background: rgba(75, 46, 138, 0.4);
+    color: #c9a8ff;
+}
+
+.sel-completo {
+    font-size: 0.7rem;
+    color: #4caf7d;
+    font-weight: 600;
+}
+
+.sel-btn-completo {
+    border-color: rgba(76, 175, 125, 0.4) !important;
+}
+
 .p3-controls {
     display: flex;
     align-items: center;
