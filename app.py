@@ -28,6 +28,10 @@ def home():
 def tareas():
     return render_template('tareas.html')
 
+@app.route('/procesos')
+def procesos():
+    return render_template('procesos.html')
+
 @app.route('/simulacion')
 def simulacion():
     return render_template('simulacion.html')
@@ -224,12 +228,19 @@ def procesos_creados():
         p = node.GetData()
         es_inicial = (i == 0)
         es_final   = (i == total - 1)
+        tareas = []
+        t_node = p.tasks.GetHead()
+        while t_node:
+            t = t_node.GetData()
+            tareas.append({'n': t.n, 'tiempo_proceso': t.processing_t})
+            t_node = t_node.next
         lista.append({
             'nombre':   p.name,
             'productos': simulation['cantidad_global'],
             'n_tareas':  p.n_tasks,
             'inicial':   es_inicial,
-            'final':     es_final
+            'final':     es_final,
+            'tareas':    tareas
         })
         node = node.next
         i += 1
@@ -237,6 +248,30 @@ def procesos_creados():
         'procesos': lista,
         'cantidad_global': simulation['cantidad_global']
     })
+
+@app.route('/api/actualizar-tarea', methods=['POST'])
+def actualizar_tarea():
+    if simulation['running'] and not simulation['paused']:
+        return jsonify({'ok': False, 'mensaje': 'Pausá la simulación antes de modificar'})
+    data = request.get_json()
+    nombre_proceso = data.get('proceso')
+    n_tarea        = int(data.get('tarea'))
+    nuevo_tiempo   = int(data.get('tiempo'))
+    if nuevo_tiempo < 1:
+        return jsonify({'ok': False, 'mensaje': 'El tiempo debe ser al menos 1'})
+    node = simulation['process_list'].GetHead()
+    while node:
+        p = node.GetData()
+        if p.name == nombre_proceso:
+            t_node = p.tasks.GetHead()
+            while t_node:
+                t = t_node.GetData()
+                if t.n == n_tarea:
+                    t.processing_t = nuevo_tiempo
+                    return jsonify({'ok': True})
+                t_node = t_node.next
+        node = node.next
+    return jsonify({'ok': False, 'mensaje': 'Proceso o tarea no encontrado'})
 
 # ── Lógica de simulación ───────────────────────────────────────────────────────
 
@@ -251,7 +286,7 @@ def _get_estado():
             t = t_node.GetData()
             tareas.append({
                 'n':              t.n,
-                'procesando':     t.is_processing,
+                'procesando':     t.is_processing and simulation['running'],
                 'en_cola':        t.queue_n,
                 'tiempo_proceso': t.processing_t,
                 'completados':    p.products - t.products,
@@ -265,7 +300,8 @@ def _get_estado():
         'procesos': procesos,
         'tiempo':   simulation['current_t'],
         'paused':   simulation['paused'],
-        'running':  simulation['running']
+        'running':  simulation['running'],
+        'done':     simulation['done']
     }
 
 def _run_simulation():

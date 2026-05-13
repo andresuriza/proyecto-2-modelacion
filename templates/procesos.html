@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}LinProd – Procesos{% endblock %}
+
+{% block content %}
+<!-- HERO -->
+<header class="hero hero-estadisticas">
+    <div class="hero-text">
+        <img src="{{ url_for('static', filename='img/est-titulo.png') }}"  alt="Sistema de producción" class="est-hero-h1">
+        <img src="{{ url_for('static', filename='img/est-proyecto.png') }}" alt="Proyecto 2"           class="est-hero-sub">
+        <p class="proc-hero-label">Procesos</p>
+    </div>
+</header>
+
+<div class="proc-layout">
+
+    <p class="proc-empty" id="proc-empty" style="display:none">
+        No hay procesos creados todavía. <a href="/">Ir a Home</a>
+    </p>
+
+    <!-- Grid de tarjetas de proceso -->
+    <div class="proc-grid" id="proc-grid"></div>
+
+    <!-- Mini panel de edición (aparece al seleccionar un proceso) -->
+    <div class="proc-panel" id="proc-panel" style="display:none">
+        <h3 class="proc-panel-titulo" id="proc-panel-titulo"></h3>
+        <div id="proc-panel-tareas"></div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/procesos-config.js') }}"></script>
+{% endblock %}

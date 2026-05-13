@@ -1,7 +1,7 @@
 // socket viene de base.html como window.socket
 const CIRCUM = 69.12; // 2 * π * 11
 
-let estado = { procesos: [], tiempo: 0 };
+let estado = { procesos: [], tiempo: 0, done: false };
 let procesoActivo = 0;
 
 // ── SocketIO ──────────────────────────────────────────────────────────────────
@@ -166,6 +166,19 @@ function actualizarCard(card, tarea, proceso) {
 
     colaEl.textContent = `En cola: ${tarea.en_cola}`;
 }
+
+// ── Botones navegación ────────────────────────────────────────────────────────
+document.getElementById('btn-modificar')?.addEventListener('click', () => {
+    if (estado.done) {
+        window.location.href = '/procesos';
+    } else {
+        mostrarToast('La línea debe terminar primero');
+    }
+});
+
+document.getElementById('btn-agregar')?.addEventListener('click', () => {
+    window.location.href = '/';
+});
 
 // ── Botón iniciar ─────────────────────────────────────────────────────────────
 document.getElementById('btn-iniciar')?.addEventListener('click', async () => {

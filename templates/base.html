@@ -24,7 +24,8 @@
         </div>
         <ul class="navbar-links">
             <li><a href="/"             {% if request.endpoint == 'home'         %}class="active"{% endif %}>Home</a></li>
-            <li><a href="/simulacion"    {% if request.endpoint == 'simulacion'   %}class="active"{% endif %}>Simulación</a></li>
+            <li><a href="/procesos"     {% if request.endpoint == 'procesos'     %}class="active"{% endif %}>Procesos</a></li>
+            <li><a href="/simulacion"   {% if request.endpoint == 'simulacion'   %}class="active"{% endif %}>Simulación</a></li>
             <li><a href="/estadisticas" {% if request.endpoint == 'estadisticas' %}class="active"{% endif %}>Estadísticas</a></li>
         </ul>
     </nav>
