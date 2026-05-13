@@ -10,6 +10,7 @@ socket.on('tick',   (data) => { actualizarEstado(data); });
 socket.on('simulacion_terminada', (data) => {
     actualizarEstado(data);
     mostrarToast('Simulación completada');
+    mostrarReiniciar();
 });
 
 // ── Actualizar estado completo ────────────────────────────────────────────────
@@ -155,6 +156,29 @@ document.getElementById('btn-iniciar')?.addEventListener('click', async () => {
     const res  = await fetch('/api/iniciar', { method: 'POST' });
     const data = await res.json();
     mostrarToast(data.ok ? 'Simulación iniciada' : data.mensaje);
+});
+
+// ── Panel de reinicio ─────────────────────────────────────────────────────────
+function mostrarReiniciar() {
+    const panel  = document.getElementById('reiniciar-panel');
+    const input  = document.getElementById('input-nueva-cantidad');
+    if (!panel) return;
+    input.value = estado.procesos[0]?.tareas[0]?.total || '';
+    panel.style.display = 'block';
+}
+
+document.getElementById('btn-reiniciar')?.addEventListener('click', async () => {
+    const cantidad = parseInt(document.getElementById('input-nueva-cantidad').value);
+    if (!cantidad || cantidad < 1) { mostrarToast('Ingresá una cantidad válida'); return; }
+
+    document.getElementById('reiniciar-panel').style.display = 'none';
+    const res  = await fetch('/api/reiniciar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cantidad })
+    });
+    const data = await res.json();
+    mostrarToast(data.ok ? 'Reiniciando...' : data.mensaje);
 });
 
 function actualizarPausa(paused, running) {

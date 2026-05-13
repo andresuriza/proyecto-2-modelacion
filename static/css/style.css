@@ -801,3 +801,39 @@ body {
     color: var(--purple-light);
     font-weight: 600;
 }
+
+/* ── Panel reinicio (procesos) ────────────────────────────────────────────── */
+#reiniciar-panel {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #222228;
+}
+
+.reiniciar-label {
+    display: block;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 0.5rem;
+}
+
+.reiniciar-row {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.reiniciar-input {
+    background: var(--input-bg);
+    border: 1px solid #333340;
+    border-radius: 8px;
+    color: var(--text);
+    padding: 0.45rem 0.75rem;
+    font-size: 0.9rem;
+    outline: none;
+    width: 90px;
+    transition: border-color 0.2s;
+}
+
+.reiniciar-input:focus { border-color: var(--purple); }

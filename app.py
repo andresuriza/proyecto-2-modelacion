@@ -141,6 +141,38 @@ def iniciar():
     threading.Thread(target=_run_simulation, daemon=True).start()
     return jsonify({'ok': True})
 
+@app.route('/api/reiniciar', methods=['POST'])
+def reiniciar():
+    if simulation['running']:
+        return jsonify({'ok': False, 'mensaje': 'Ya hay una simulación corriendo'})
+    if simulation['process_list'].GetHead() is None:
+        return jsonify({'ok': False, 'mensaje': 'No hay procesos creados'})
+
+    data = request.get_json() or {}
+    nueva_cantidad = data.get('cantidad')
+    if nueva_cantidad:
+        nueva_cantidad = int(nueva_cantidad)
+        simulation['cantidad_global'] = nueva_cantidad
+        node = simulation['process_list'].GetHead()
+        while node:
+            p = node.GetData()
+            p.products = nueva_cantidad
+            t_node = p.tasks.GetHead()
+            while t_node:
+                t_node.GetData()._initial_products = nueva_cantidad
+                t_node = t_node.next
+            node = node.next
+
+    simulation['running'] = True
+    simulation['done']    = False
+    simulation['paused']  = False
+    prod.done             = False
+    prod.paused           = False
+    prod.current_t        = 0
+
+    threading.Thread(target=_run_simulation, daemon=True).start()
+    return jsonify({'ok': True})
+
 @app.route('/api/pausar', methods=['POST'])
 def pausar():
     simulation['paused'] = not simulation['paused']
