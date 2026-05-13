@@ -169,10 +169,10 @@ function actualizarCard(card, tarea, proceso) {
 
 // ── Botones navegación ────────────────────────────────────────────────────────
 document.getElementById('btn-modificar')?.addEventListener('click', () => {
-    if (estado.done) {
+    if (!estado.running || estado.paused) {
         window.location.href = '/procesos';
     } else {
-        mostrarToast('La línea debe terminar primero');
+        mostrarToast('Pausá la simulación antes de modificar');
     }
 });
 

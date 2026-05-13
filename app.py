@@ -251,8 +251,8 @@ def procesos_creados():
 
 @app.route('/api/actualizar-tarea', methods=['POST'])
 def actualizar_tarea():
-    if simulation['running'] and not simulation['paused']:
-        return jsonify({'ok': False, 'mensaje': 'Pausá la simulación antes de modificar'})
+    if simulation['running']:
+        return jsonify({'ok': False, 'mensaje': 'No se puede modificar mientras la simulación está activa'})
     data = request.get_json()
     nombre_proceso = data.get('proceso')
     n_tarea        = int(data.get('tarea'))
