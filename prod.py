@@ -51,6 +51,7 @@ class Process:
     def __init__(self, name, products):
         self.enabled = True
         self.next = None
+        self.prev = None
         self.name = name
         self.n_tasks = 0
         self.products = products
@@ -61,6 +62,10 @@ class Process:
     # Referencia a siguiente proceso
     def SetNext(self, next):
         self.next = next
+
+    # Referencia al proceso anterior (proceso de entrada)
+    def SetPrev(self, prev):
+        self.prev = prev
 
     def SetEnabled(self):
         self.enabled = True
@@ -218,6 +223,7 @@ def set_next_process(head):
 
     while tmp.next != None:
         tmp.GetData().SetNext(tmp.next.GetData())
+        tmp.next.GetData().SetPrev(tmp.GetData())
 
         # Enlaza la última tarea de este proceso con la primera del siguiente
         last_node = tmp.GetData().tasks.GetHead()

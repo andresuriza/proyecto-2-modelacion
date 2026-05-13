@@ -28,9 +28,9 @@ def home():
 def tareas():
     return render_template('tareas.html')
 
-@app.route('/procesos')
-def procesos():
-    return render_template('procesos.html')
+@app.route('/simulacion')
+def simulacion():
+    return render_template('simulacion.html')
 
 @app.route('/estadisticas')
 def estadisticas():
