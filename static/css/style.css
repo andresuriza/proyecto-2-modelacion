@@ -25,7 +25,7 @@ body {
 .navbar {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
     padding: 0 2.5rem;
     height: 60px;
     background: #0e0e10;
@@ -50,6 +50,9 @@ body {
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 .tiempo-bar {
@@ -130,7 +133,7 @@ body {
 }
 
 .hero-home   { background-image: url('/static/img/fondo-home.png'); }
-.hero-tareas { background-image: url('/static/img/fondo-tareas.png'); }
+.hero-tareas { background-image: url('/static/img/fondo-home.png'); }
 
 .hero-text {
     position: relative;
@@ -925,6 +928,29 @@ body {
     font-size: 0.82rem;
     color: var(--text-muted);
     text-align: center;
+}
+
+.proc-card-actions {
+    display: flex;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+}
+
+.btn-proc-pos {
+    flex: 1;
+    padding: 0.25rem 0;
+    font-size: 0.72rem;
+    background: transparent;
+    border: 1px solid #333;
+    border-radius: 6px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+}
+
+.btn-proc-pos:hover {
+    border-color: var(--accent);
+    color: var(--accent);
 }
 
 /* Mini panel de edición */

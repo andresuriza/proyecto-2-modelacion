@@ -249,6 +249,21 @@ def procesos_creados():
         'cantidad_global': simulation['cantidad_global']
     })
 
+@app.route('/api/mover-proceso', methods=['POST'])
+def mover_proceso():
+    if simulation['running']:
+        return jsonify({'ok': False, 'mensaje': 'No se puede reordenar mientras la simulación está activa'})
+    data = request.get_json()
+    nombre = data.get('nombre')
+    accion = data.get('accion')
+    if accion == 'head':
+        simulation['process_list'].new_head(nombre)
+    elif accion == 'tail':
+        simulation['process_list'].new_tail(nombre)
+    else:
+        return jsonify({'ok': False, 'mensaje': 'Acción inválida'})
+    return jsonify({'ok': True})
+
 @app.route('/api/actualizar-tarea', methods=['POST'])
 def actualizar_tarea():
     if simulation['running']:

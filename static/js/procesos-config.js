@@ -29,7 +29,30 @@ async function cargarProcesos() {
         card.innerHTML = `
             <div class="letra-metal proc-letra">${p.nombre[0].toUpperCase()}</div>
             <div class="proc-card-nombre">${p.nombre}${badges ? ' ' + badges : ''}</div>
+            <div class="proc-card-actions">
+                <button class="btn-proc-pos" data-nombre="${p.nombre}" data-accion="head">Inicio</button>
+                <button class="btn-proc-pos" data-nombre="${p.nombre}" data-accion="tail">Fin</button>
+            </div>
         `;
+
+        card.querySelectorAll('.btn-proc-pos').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.stopPropagation();
+                const res  = await fetch('/api/mover-proceso', {
+                    method:  'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body:    JSON.stringify({ nombre: btn.dataset.nombre, accion: btn.dataset.accion })
+                });
+                const data = await res.json();
+                if (data.ok) {
+                    procesoSeleccionado = null;
+                    document.getElementById('proc-panel').style.display = 'none';
+                    cargarProcesos();
+                } else {
+                    mostrarToast(data.mensaje);
+                }
+            });
+        });
 
         card.addEventListener('click', () => seleccionarProceso(p, i));
         grid.appendChild(card);

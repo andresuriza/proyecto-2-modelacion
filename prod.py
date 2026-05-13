@@ -44,8 +44,46 @@ class LinkedList:
 
             while tmp.next != None:
                 tmp = tmp.next
-            
+
             tmp.next = new_val
+
+    def new_head(self, name):
+        if self.head is None or self.head.GetData().name == name:
+            return
+        prev = None
+        curr = self.head
+        while curr:
+            if curr.GetData().name == name:
+                break
+            prev = curr
+            curr = curr.next
+        if curr is None:
+            return
+        prev.next = curr.next
+        curr.next = self.head
+        self.head = curr
+
+    def new_tail(self, name):
+        if self.head is None:
+            return
+        prev = None
+        curr = self.head
+        while curr:
+            if curr.GetData().name == name:
+                break
+            prev = curr
+            curr = curr.next
+        if curr is None or curr.next is None:
+            return
+        if prev is None:
+            self.head = curr.next
+        else:
+            prev.next = curr.next
+        curr.next = None
+        tmp = self.head
+        while tmp.next:
+            tmp = tmp.next
+        tmp.next = curr
 
 class Process:
     def __init__(self, name, products):
