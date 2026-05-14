@@ -376,7 +376,7 @@ body {
     letter-spacing: -3px;
     line-height: 1;
     margin: 0.5rem 0 1.5rem;
-    background: linear-gradient(
+    /* background: linear-gradient(
         155deg,
         #ffffff  0%,
         #d0d0d0 12%,
@@ -387,6 +387,14 @@ body {
         #606060 76%,
         #d8d8d8 88%,
         #ffffff 100%
+    ); */
+    background: linear-gradient(
+        155deg,
+        #ffffff 0%,
+        #d8d8d8 25%,
+        #a0a0a0 50%,
+        #d0d0d0 75%,
+        #f0f0f0 100%
     );
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -395,6 +403,23 @@ body {
     pointer-events: none;
     user-select: none;
     word-break: break-all;
+}
+
+/* ── Texto blanco-gris reutilizable ──────────────────────────────────────── */
+.letra-gris {
+    background: linear-gradient(
+        155deg,
+        #ffffff 0%,
+        #d8d8d8 25%,
+        #a0a0a0 50%,
+        #d0d0d0 75%,
+        #f0f0f0 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    pointer-events: none;
+    user-select: none;
 }
 
 .p3-selector {
@@ -870,12 +895,12 @@ body {
 .reiniciar-input:focus { border-color: var(--purple); }
 
 .btn-borrar {
-    background: transparent;
-    border: 1px solid #cc4444;
-    color: #cc4444;
+    background: #ffffff;
+    border: 1px solid #ffffff;
+    color: var(--purple);
 }
 
-.btn-borrar:hover { background: rgba(204, 68, 68, 0.15); }
+.btn-borrar:hover { background: #e8e8e8; border-color: #e8e8e8; }
 
 /* ── Página Procesos (gestión de tiempos) ─────────────────────────────────── */
 .proc-hero-label {
@@ -909,20 +934,20 @@ body {
     background: var(--bg-card);
     border: 1px solid #222228;
     border-radius: var(--radius);
-    padding: 1.5rem 1.25rem 1rem;
+    padding: 2rem 1.75rem 1.25rem;
     cursor: pointer;
     transition: border-color 0.2s, background 0.2s;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 0.5rem;
-    min-width: 130px;
+    min-width: 170px;
 }
 
 .proc-card:hover  { border-color: var(--purple-dark); background: #1e1e22; }
 .proc-card.activo { border-color: var(--purple); background: rgba(123, 79, 204, 0.1); }
 
-.proc-letra { font-size: 5rem; margin: 0; line-height: 1; }
+.proc-letra { font-size: 7rem; margin: 0; line-height: 1; }
 
 .proc-card-nombre {
     font-size: 0.82rem;
@@ -932,14 +957,16 @@ body {
 
 .proc-card-actions {
     display: flex;
-    gap: 0.4rem;
+    justify-content: space-between;
     margin-top: 0.5rem;
+    width: 100%;
 }
 
 .btn-proc-pos {
-    flex: 1;
-    padding: 0.25rem 0;
-    font-size: 0.72rem;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
     background: transparent;
     border: 1px solid #333;
     border-radius: 6px;
