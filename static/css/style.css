@@ -343,7 +343,7 @@ body {
 
 /* Panel izquierdo */
 .p3-left {
-    width: 38%;
+    width: 40%;
     background: #0e0e10;
     display: flex;
     flex-direction: column;
@@ -898,6 +898,7 @@ body {
     background: #ffffff;
     border: 1px solid #ffffff;
     color: var(--purple);
+    white-space: nowrap;
 }
 
 .btn-borrar:hover { background: #e8e8e8; border-color: #e8e8e8; }
