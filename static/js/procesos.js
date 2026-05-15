@@ -33,7 +33,12 @@ function actualizarTiempo(t) {
     const fill  = document.getElementById('tiempo-fill');
     const valor = document.getElementById('tiempo-valor');
     const max   = calcularTiempoMax();
-    const pct   = max > 0 ? Math.min((t / max) * 100, 100) : 0;
+    let pct     = max > 0 ? Math.min((t / max) * 100, 100) : 0;
+    
+    if (estado.done) {
+        pct = 100;
+    }
+    
     fill.style.width   = pct + '%';
     valor.textContent  = `t = ${t}`;
 }
