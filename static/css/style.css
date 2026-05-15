@@ -405,23 +405,6 @@ body {
     word-break: break-all;
 }
 
-/* ── Texto blanco-gris reutilizable ──────────────────────────────────────── */
-.letra-gris {
-    background: linear-gradient(
-        155deg,
-        #ffffff 0%,
-        #d8d8d8 25%,
-        #a0a0a0 50%,
-        #d0d0d0 75%,
-        #f0f0f0 100%
-    );
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    pointer-events: none;
-    user-select: none;
-}
-
 .p3-selector {
     display: flex;
     flex-direction: column;

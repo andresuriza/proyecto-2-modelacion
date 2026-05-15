@@ -1,6 +1,4 @@
-// socket viene de base.html como window.socket
-
-// ── Al cargar Home, mostrar procesos ya creados ───────────────────────────────
+// Al cargar Home, mostrar procesos ya creados 
 cargarProcesosExistentes();
 
 async function cargarProcesosExistentes() {
@@ -15,7 +13,7 @@ async function cargarProcesosExistentes() {
     }
 }
 
-// ── Formulario nuevo proceso ──────────────────────────────────────────────────
+// Formulario nuevo proceso 
 document.getElementById('form-proceso')?.addEventListener('submit', function (e) {
     e.preventDefault();
 
@@ -36,7 +34,7 @@ document.getElementById('form-proceso')?.addEventListener('submit', function (e)
     window.location.href = '/tareas';
 });
 
-// ── Render lista de procesos ──────────────────────────────────────────────────
+// Render lista de procesos 
 function renderLinea(lista, cantidadGlobal) {
     const card  = document.getElementById('card-linea');
     const linea = document.getElementById('linea-lista');
@@ -66,7 +64,7 @@ function renderLinea(lista, cantidadGlobal) {
     });
 }
 
-// ── Toast ─────────────────────────────────────────────────────────────────────
+// Toast 
 function mostrarToast(msg) {
     let toast = document.querySelector('.toast');
     if (!toast) {
