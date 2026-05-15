@@ -1,14 +1,18 @@
 import threading
 import time
+from collections import deque
 
 current_t = 0
 done = False
+paused = False
 lock = threading.Lock()
 
 # Contador de ciclos
 def cycle():
     while not done:
         global current_t
+        while paused:
+            time.sleep(0.1)
         lock.acquire()
         print(f"---- Tiempo: {current_t}-----")
         lock.release()
@@ -40,16 +44,56 @@ class LinkedList:
 
             while tmp.next != None:
                 tmp = tmp.next
-            
+
             tmp.next = new_val
+
+    def new_head(self, name):
+        if self.head is None or self.head.GetData().name == name:
+            return
+        prev = None
+        curr = self.head
+        while curr:
+            if curr.GetData().name == name:
+                break
+            prev = curr
+            curr = curr.next
+        if curr is None:
+            return
+        prev.next = curr.next
+        curr.next = self.head
+        self.head = curr
+
+    def new_tail(self, name):
+        if self.head is None:
+            return
+        prev = None
+        curr = self.head
+        while curr:
+            if curr.GetData().name == name:
+                break
+            prev = curr
+            curr = curr.next
+        if curr is None or curr.next is None:
+            return
+        if prev is None:
+            self.head = curr.next
+        else:
+            prev.next = curr.next
+        curr.next = None
+        tmp = self.head
+        while tmp.next:
+            tmp = tmp.next
+        tmp.next = curr
 
 class Process:
     def __init__(self, name, products):
         self.enabled = True
         self.next = None
+        self.prev = None
         self.name = name
         self.n_tasks = 0
         self.products = products
+        self.is_first = False
         self.threads = []
         self.tasks = LinkedList()
 
@@ -57,39 +101,43 @@ class Process:
     def SetNext(self, next):
         self.next = next
 
+    # Referencia al proceso anterior (proceso de entrada)
+    def SetPrev(self, prev):
+        self.prev = prev
+
     def SetEnabled(self):
         self.enabled = True
     
     def CreateTask(self, processing_t):
         self.n_tasks += 1
         t = Task(self.n_tasks, processing_t, self.products)
+        t.process_name = self.name
         self.tasks.Insert(t)
-        self.threads.append(threading.Thread(target=t.Run))
 
     def JoinThreads(self):
-        n = len(self.threads)
-        for i in range(n):
-            self.threads[i].join()
+        for t in self.threads:
+            t.join()
 
-            # Si es la ultima tarea, iniciar proximo proceso
-            if (i == (n - 1)):
-                if self.next != None:
-                    self.next.StartThreads()
-                    self.next.JoinThreads()
+    def Reset(self):
+        self.next = None
+        node = self.tasks.GetHead()
+        while node:
+            node.GetData().Reset()
+            node = node.next
+        self.QueueProducts(queue=self.is_first)
 
-    def QueueProducts(self):
+    def QueueProducts(self, queue=True):
         head = self.tasks.GetHead()
 
-        # Se encolan productos a la primera tarea
-        for _ in range(self.products):
-            head.GetData().Queue()
+        # Solo el primer proceso encola productos
+        if queue:
+            for _ in range(self.products):
+                head.GetData().Queue()
 
+        # Siempre enlaza tareas dentro del proceso
         while head != None:
-
-            # Tarea referencia a la siguiente
             if head.next != None:
                 head.GetData().SetNext(head.next.GetData())
-
             head = head.next
 
 
@@ -97,30 +145,46 @@ class Process:
     def StartThreads(self):
         print(f"\033[91m --- {self.name} --- \033[0m")
 
+        # Crea threads frescos cada vez (los threads de Python no se pueden reiniciar)
+        self.threads = []
+        node = self.tasks.GetHead()
+        while node:
+            self.threads.append(threading.Thread(target=node.GetData().Run, daemon=True))
+            node = node.next
+
         for task in self.threads:
             task.start()
 
 class Task:
     def __init__(self, n, processing_t, products):
-        self.products = products
-        self.next = None
-        # Numero de tarea
-        self.n = n
-        # Tiempo de procesamiento
-        self.processing_t = processing_t
-        # Bool, se esta procesando?
+        self._initial_products = products
+        self.products      = products
+        self.next          = None
+        self.n             = n
+        self.processing_t  = processing_t
         self.is_processing = False
-        # Contenido encolado
-        self.queue_n = 0
-        self.current = 1
+        self.queue_n       = 0
+        self.current       = 1
+        self.process_name  = ''
+        self._queue_times  = deque()  # timestamp de llegada de cada producto a la cola
+        self._records      = []       # historial: {product, queued_at, done_at, wait}
+
+    def Reset(self):
+        self.products      = self._initial_products
+        self.queue_n       = 0
+        self.is_processing = False
+        self.current       = 1
+        self.next          = None
+        self._queue_times  = deque()
+        self._records      = []
 
     def SetNext(self, next):
         self.next = next
 
     def Queue(self):
+        self._queue_times.append(current_t)
         if not self.is_processing:
             self.is_processing = True
-            
         self.queue_n += 1
     
     def Run(self):
@@ -130,12 +194,19 @@ class Task:
             # Ya termino, no mas bucle
             if self.products == 0:
                 break
-            
+            if done:
+                break
+
+            time.sleep(0.05)  # evita busy-wait que bloquea el GIL
+
+            while paused:
+                time.sleep(0.1)
+
             if self.is_processing:
                 # Mientras queden productos
                 if self.queue_n > 0:
-                    # Si ha transcurrido ya el tiempo necesario
-                    if ((current_t - prev_t) == self.processing_t):
+                    # >= en vez de == para no perderse un ciclo si el thread se atrasa
+                    if ((current_t - prev_t) >= self.processing_t):
                         lock.acquire()
                         print(f"Tarea{self.n}")
                         print(f"Procesando producto #{self.current}")
@@ -144,6 +215,15 @@ class Task:
                         self.queue_n -= 1
                         print(f"Encolados: {self.queue_n}")
                         lock.release()
+                        # Registrar estadísticas del producto completado
+                        queued_at = self._queue_times.popleft() if self._queue_times else current_t
+                        self._records.append({
+                            'product':   self.current,
+                            'queued_at': int(queued_at),
+                            'done_at':   int(current_t),
+                            'wait':      max(0, int(current_t) - self.processing_t - int(queued_at))
+                        })
+
                         # Pasa a siguiente producto
                         self.current += 1
                         # El tiempo empieza a contar a partir de ahora
@@ -181,36 +261,53 @@ def set_next_process(head):
 
     while tmp.next != None:
         tmp.GetData().SetNext(tmp.next.GetData())
+        tmp.next.GetData().SetPrev(tmp.GetData())
+
+        # Enlaza la última tarea de este proceso con la primera del siguiente
+        last_node = tmp.GetData().tasks.GetHead()
+        while last_node.next:
+            last_node = last_node.next
+        next_first = tmp.next.GetData().tasks.GetHead()
+        if next_first:
+            last_node.GetData().SetNext(next_first.GetData())
+
         tmp = tmp.next
 
 
-process_list = LinkedList()
+if __name__ == '__main__':
+    process_list = LinkedList()
 
-first_p = Process(input("Digite proceso: "), int(input("Numero de productos=")))
-input_tasks(first_p)
-first_p.SetEnabled()
+    cantidad_global = int(input("Numero de productos (global)= "))
 
-process_list.Insert(first_p)
+    first_p = Process(input("Digite proceso: "), cantidad_global)
+    first_p.is_first = True
+    input_tasks(first_p)
+    first_p.SetEnabled()
+    process_list.Insert(first_p)
 
-while True:
-    req = input("Crear otro proceso? ").lower()
+    while True:
+        req = input("Crear otro proceso? ").lower()
+        if req == "s":
+            p = Process(input("Digite proceso: "), cantidad_global)
+            input_tasks(p)
+            process_list.Insert(p)
+        elif req == "n":
+            break
+        else:
+            print("Uso incorrecto: por favor escribir 's' o 'n'")
 
-    if req == "s":
-       p = Process(input("Digite proceso: "), int(input("Numero de productos=")))
-       input_tasks(p)
-       process_list.Insert(p)
-    elif req == "n":
-        break
-    else:
-        print("Uso incorrecto: por favor escribir 's' o 'n'")
+    set_next_process(process_list.GetHead())
 
-# Asociar procesos entre si
-set_next_process(process_list.GetHead())
+    t1 = threading.Thread(target=cycle)
+    t1.start()
 
-t1 = threading.Thread(target=cycle)
+    # Arranca todos los procesos en pipeline
+    node = process_list.GetHead()
+    while node:
+        node.GetData().StartThreads()
+        node = node.next
 
-process_list.GetHead().GetData().SetEnabled()
-
-t1.start()
-process_list.GetHead().GetData().StartThreads()
-process_list.GetHead().GetData().JoinThreads()
+    node = process_list.GetHead()
+    while node:
+        node.GetData().JoinThreads()
+        node = node.next

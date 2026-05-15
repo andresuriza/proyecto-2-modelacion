@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}LinProd{% endblock %}
+
+{% block content %}
+    <!-- HERO -->
+    <section class="hero hero-home">
+        <div class="hero-text">
+            <h1>Home</h1>
+        </div>
+    </section>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main class="main-content">
+
+        <!-- Formulario nuevo proceso -->
+        <div class="card">
+            <form id="form-proceso">
+                <div class="form-group">
+                    <label>Nombre del proceso</label>
+                    <input type="text" id="nombre-proceso" placeholder="" required>
+                </div>
+                <div class="form-group" id="grupo-cantidad">
+                    <label>Cantidad de productos (global)</label>
+                    <input type="number" id="cantidad-producto" min="1" placeholder="" required>
+                </div>
+                <div class="form-group">
+                    <label>Cantidad de tareas</label>
+                    <input type="number" id="cantidad-tareas" min="1" placeholder="" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-crear">Crear</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Lista de procesos ya creados -->
+        <div class="card" id="card-linea" style="display:none">
+            <h2 class="card-title">Línea de producción</h2>
+            <div id="linea-lista"></div>
+            <div class="form-actions" style="margin-top:1.25rem">
+                <button class="btn-crear" onclick="window.location.href='/simulacion'">
+                    Ver simulación →
+                </button>
+            </div>
+        </div>
+
+    </main>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% endblock %}

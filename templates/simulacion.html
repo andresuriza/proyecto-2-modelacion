@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}LinProd – Simulación{% endblock %}
+
+{% block content %}
+    <!-- LAYOUT PRINCIPAL -->
+    <div class="p3-layout">
+
+        <!-- PANEL IZQUIERDO -->
+        <aside class="p3-left">
+            <h1 class="p3-titulo">Proceso</h1>
+            <div class="letra-metal" id="letra-proceso">—</div>
+
+            <!-- Selector de proceso si hay varios -->
+            <div class="p3-selector" id="p3-selector"></div>
+
+            <div class="p3-controls">
+                <button class="btn-crear" id="btn-iniciar">Iniciar</button>
+                <button class="btn-crear" id="btn-modificar">Modificar</button>
+                <button class="btn-crear" id="btn-agregar">Agregar</button>
+                <button class="btn-crear btn-borrar" id="btn-borrar-linea">Borrar línea</button>
+            </div>
+
+            <div id="reiniciar-panel" style="display:none">
+                <label class="reiniciar-label">Productos para siguiente simulación</label>
+                <div class="reiniciar-row">
+                    <input type="number" id="input-nueva-cantidad" class="reiniciar-input" min="1">
+                    <button class="btn-crear" id="btn-reiniciar">Reiniciar</button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- PANEL DERECHO: fondo iridiscente + tarjetas scrolleables -->
+        <section class="p3-right">
+            <div class="p3-right-bg"></div>
+            <div class="p3-tareas-scroll" id="p3-tareas-scroll">
+                <!-- Cards se generan con JS -->
+                <p class="p3-empty" id="p3-empty">No hay procesos creados todavía.</p>
+            </div>
+        </section>
+
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/procesos.js') }}"></script>
+{% endblock %}

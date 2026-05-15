@@ -1,0 +1,27 @@
+﻿{% extends "base.html" %}
+{% block title %}LinProd - Mis tareas{% endblock %}
+
+{% block content %}
+    <!-- HERO -->
+    <section class="hero hero-tareas">
+        <div class="hero-text">
+            <h1>Mis tareas</h1>
+        </div>
+    </section>
+
+    <!-- CONTENIDO -->
+    <main class="main-content">
+        <div class="card tareas-card">
+            <div id="tareas-lista"></div>
+
+            <div class="form-actions" style="margin-top:1.5rem; gap:1rem;">
+                <button class="btn-crear" id="btn-guardar">Guardar proceso</button>
+                <button class="btn-crear btn-outline" id="btn-volver" onclick="window.location='/'">Volver</button>
+            </div>
+        </div>
+    </main>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/tareas.js') }}"></script>
+{% endblock %}

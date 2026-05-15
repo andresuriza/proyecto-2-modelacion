@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}LinProd{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+
+        <div class="navbar-tiempo">
+            <div class="tiempo-bar">
+                <span class="tiempo-label">Tiempo</span>
+                <div class="tiempo-fill" id="tiempo-fill" style="width: 0%"></div>
+            </div>
+            <span class="tiempo-valor" id="tiempo-valor">t = 0</span>
+            <button class="btn-pausa" id="btn-pausa" title="Pausar" disabled>
+                <span class="pausa-icon">&#9654;</span>
+            </button>
+        </div>
+        <ul class="navbar-links">
+            <li><a href="/"             {% if request.endpoint == 'home'         %}class="active"{% endif %}>Home</a></li>
+            <li><a href="/procesos"     {% if request.endpoint == 'procesos'     %}class="active"{% endif %}>Procesos</a></li>
+            <li><a href="/simulacion"   {% if request.endpoint == 'simulacion'   %}class="active"{% endif %}>Simulación</a></li>
+            <li><a href="/estadisticas" {% if request.endpoint == 'estadisticas' %}class="active"{% endif %}>Estadísticas</a></li>
+        </ul>
+    </nav>
+
+    {% block content %}{% endblock %}
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+        // Socket global compartido — una sola conexión por página
+        window.socket = io();
+
+        function _navbarActualizar(data) {
+            const fill  = document.getElementById('tiempo-fill');
+            const valor = document.getElementById('tiempo-valor');
+            const btn   = document.getElementById('btn-pausa');
+
+            if (valor) valor.textContent = `t = ${data.tiempo}`;
+
+            if (fill && data.procesos) {
+                let tmax = 0;
+                data.procesos.forEach(p => p.tareas.forEach(t => { tmax += t.tiempo_proceso; }));
+                tmax = tmax * (data.procesos[0]?.tareas[0]?.total || 1);
+                const pct = tmax > 0 ? Math.min((data.tiempo / tmax) * 100, 100) : 0;
+                fill.style.width = pct + '%';
+            }
+
+            if (btn) {
+                btn.disabled = !data.running;
+                btn.classList.toggle('paused', !!data.paused);
+                btn.querySelector('.pausa-icon').innerHTML = data.paused ? '&#9646;&#9646;' : '&#9654;';
+            }
+        }
+
+        socket.on('estado',               _navbarActualizar);
+        socket.on('tick',                 _navbarActualizar);
+        socket.on('simulacion_terminada', _navbarActualizar);
+
+        document.getElementById('btn-pausa').addEventListener('click', async () => {
+            const res  = await fetch('/api/pausar', { method: 'POST' });
+            const data = await res.json();
+            _navbarActualizar(data);
+        });
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
