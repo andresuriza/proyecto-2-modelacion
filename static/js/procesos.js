@@ -1,4 +1,3 @@
-// socket viene de base.html como window.socket
 const CIRCUM = 69.12; // 2 * π * 11
 
 let estado = { procesos: [], tiempo: 0, done: false };
@@ -218,7 +217,7 @@ function actualizarPausa(paused, running) {
     btn.querySelector('.pausa-icon').innerHTML = paused ? '&#9646;&#9646;' : '&#9654;';
 }
 
-//  Botón borrar línea 
+// Botón borrar línea 
 document.getElementById('btn-borrar-linea')?.addEventListener('click', async () => {
     const res  = await fetch('/api/reset-linea', { method: 'POST' });
     const data = await res.json();
