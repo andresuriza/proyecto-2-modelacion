@@ -4,7 +4,7 @@ const CIRCUM = 69.12; // 2 * π * 11
 let estado = { procesos: [], tiempo: 0, done: false };
 let procesoActivo = 0;
 
-// ── SocketIO ──────────────────────────────────────────────────────────────────
+//  SocketIO 
 socket.on('estado', (data) => { actualizarEstado(data); });
 socket.on('tick',   (data) => { actualizarEstado(data); });
 socket.on('simulacion_terminada', (data) => {
@@ -13,7 +13,7 @@ socket.on('simulacion_terminada', (data) => {
     mostrarReiniciar();
 });
 
-// ── Actualizar estado completo ────────────────────────────────────────────────
+// Actualizar estado completo 
 function actualizarEstado(data) {
     estado = data;
     actualizarTiempo(data.tiempo);
@@ -28,7 +28,7 @@ function actualizarLetra(proceso) {
     if (el && proceso) el.textContent = proceso.nombre;
 }
 
-// ── Barra de tiempo ───────────────────────────────────────────────────────────
+// Barra de tiempo 
 function actualizarTiempo(t) {
     const fill  = document.getElementById('tiempo-fill');
     const valor = document.getElementById('tiempo-valor');
@@ -50,7 +50,7 @@ function calcularTiempoMax() {
     return sumaTareas > 0 ? sumaTareas * (total || 1) : 50;
 }
 
-// ── Selector de procesos (panel izquierdo) ────────────────────────────────────
+// Selector de procesos (panel izquierdo) 
 function renderSelector(procesos) {
     const sel = document.getElementById('p3-selector');
     if (procesos.length === 0) return;
@@ -90,7 +90,7 @@ function renderSelector(procesos) {
     });
 }
 
-// ── Tarjetas de tareas (panel derecho, scrolleable) ───────────────────────────
+// Tarjetas de tareas (panel derecho, scrolleable) 
 function renderTareas(proceso) {
     const scroll = document.getElementById('p3-tareas-scroll');
     const empty  = document.getElementById('p3-empty');
@@ -167,7 +167,7 @@ function actualizarCard(card, tarea, proceso) {
     colaEl.textContent = `En cola: ${tarea.en_cola}`;
 }
 
-// ── Botones navegación ────────────────────────────────────────────────────────
+// Botones navegación 
 document.getElementById('btn-modificar')?.addEventListener('click', () => {
     if (!estado.running || estado.paused) {
         window.location.href = '/procesos';
@@ -180,14 +180,14 @@ document.getElementById('btn-agregar')?.addEventListener('click', () => {
     window.location.href = '/';
 });
 
-// ── Botón iniciar ─────────────────────────────────────────────────────────────
+// Botón iniciar
 document.getElementById('btn-iniciar')?.addEventListener('click', async () => {
     const res  = await fetch('/api/iniciar', { method: 'POST' });
     const data = await res.json();
     mostrarToast(data.ok ? 'Simulación iniciada' : data.mensaje);
 });
 
-// ── Panel de reinicio ─────────────────────────────────────────────────────────
+// Panel de reinicio 
 function mostrarReiniciar() {
     const panel  = document.getElementById('reiniciar-panel');
     const input  = document.getElementById('input-nueva-cantidad');
@@ -218,7 +218,7 @@ function actualizarPausa(paused, running) {
     btn.querySelector('.pausa-icon').innerHTML = paused ? '&#9646;&#9646;' : '&#9654;';
 }
 
-// ── Botón borrar línea ────────────────────────────────────────────────────────
+//  Botón borrar línea 
 document.getElementById('btn-borrar-linea')?.addEventListener('click', async () => {
     const res  = await fetch('/api/reset-linea', { method: 'POST' });
     const data = await res.json();
@@ -230,7 +230,7 @@ document.getElementById('btn-borrar-linea')?.addEventListener('click', async () 
     }
 });
 
-// ── Toast ─────────────────────────────────────────────────────────────────────
+// Toast 
 function mostrarToast(msg) {
     let toast = document.querySelector('.toast');
     if (!toast) {
