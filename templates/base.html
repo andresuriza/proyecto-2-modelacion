@@ -48,7 +48,8 @@
                 let tmax = 0;
                 data.procesos.forEach(p => p.tareas.forEach(t => { tmax += t.tiempo_proceso; }));
                 tmax = tmax * (data.procesos[0]?.tareas[0]?.total || 1);
-                const pct = tmax > 0 ? Math.min((data.tiempo / tmax) * 100, 100) : 0;
+                let pct = tmax > 0 ? Math.min((data.tiempo / tmax) * 100, 100) : 0;
+                if (data.done) pct = 100;
                 fill.style.width = pct + '%';
             }
 
